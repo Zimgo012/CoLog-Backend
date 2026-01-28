@@ -2,10 +2,7 @@ package com.zimgo.colog.comment;
 
 import com.zimgo.colog.diary.Diary;
 import com.zimgo.colog.user.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,9 +19,20 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Long id;
 
+    @Column
     public String content;
-//    public User author;
-//    public Diary diaryIn;
+
+    @Column
     public Date createdAt;
+
+    @Column
     public Date modifiedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    public User author;
+
+    @ManyToOne
+    @JoinColumn(name = "diary_id")
+    public Diary diary;
 }

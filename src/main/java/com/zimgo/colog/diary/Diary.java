@@ -1,11 +1,9 @@
 package com.zimgo.colog.diary;
 
+import com.zimgo.colog.collaborator.Collaborator;
 import com.zimgo.colog.comment.Comment;
 import com.zimgo.colog.user.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,11 +21,24 @@ public class Diary {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-//    private User owner;
-//    private List<Comment> comments;
+    @Column
     private boolean isPublic;
+
+    @Column
     private Date createdAt;
+
+    @Column
     private Date modifiedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
+    @OneToMany
+    private List<Comment> comments;
+
+//    @OneToMany
+//    private List<Collaborator> collaborators;
 
 
 }
