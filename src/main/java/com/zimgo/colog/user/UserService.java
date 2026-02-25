@@ -1,7 +1,10 @@
 package com.zimgo.colog.user;
 
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 
+@Service
 public class UserService {
 
     public UserRepository userRepository;
@@ -9,7 +12,7 @@ public class UserService {
     public List<User> findAll(){ return userRepository.findAll(); }
 
     public void addUser (User user){
-        Boolean userExist = userRepository.existsByEmail(user.getEmail()) && userRepository.existByFirstName(user.getFirstName());
+        boolean userExist = userRepository.existsByEmail(user.getEmail()) && userRepository.existByFirstName(user.getFirstName());
 
         if(userExist){
             //throw error
@@ -17,9 +20,9 @@ public class UserService {
 
         userRepository.save(user);
     }
-
+    
     public void deleteUser(User user) {
-        Boolean userExist = userRepository.existsById(user.getId());
+        boolean userExist = userRepository.existsById(user.getId());
 
         if(!userExist){
             //throw error
@@ -29,7 +32,7 @@ public class UserService {
     }
 
     public void editUser(User user) {
-        Boolean userExist = userRepository.existsById(user.getId());
+        boolean userExist = userRepository.existsById(user.getId());
 
         if(!userExist){
             //throw error

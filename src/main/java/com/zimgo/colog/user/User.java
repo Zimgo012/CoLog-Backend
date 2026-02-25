@@ -3,16 +3,18 @@ package com.zimgo.colog.user;
 import com.zimgo.colog.comment.Comment;
 import com.zimgo.colog.diary.Diary;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
+@ToString
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@Table(name = "users")
 public class User {
 
     @Id
