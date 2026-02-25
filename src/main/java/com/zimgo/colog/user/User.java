@@ -30,12 +30,12 @@ public class User {
     //implement this later
 //    private String hashPassword;
 
-    @OneToMany
-    private List<Diary> diary;
-
-//private Collaborator collaborator;
-    @OneToMany
-    private List<Comment> comments;
+//    @OneToMany
+//    private List<Diary> diary;
+//
+//    //private Collaborator collaborator;
+//    @OneToMany
+//    private List<Comment> comments;
 
 
 }
