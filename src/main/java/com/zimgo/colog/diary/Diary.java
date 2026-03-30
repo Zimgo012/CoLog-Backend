@@ -30,12 +30,12 @@ public class Diary {
     @Column
     private Date modifiedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id")
-    private User owner;
-
-    @OneToMany
-    private List<Comment> comments;
+//    @ManyToOne
+//    @JoinColumn(name = "owner_id")
+//    private User owner;
+//
+//    @OneToMany
+//    private List<Comment> comments;
 
 //    @OneToMany
 //    private List<Collaborator> collaborators;
