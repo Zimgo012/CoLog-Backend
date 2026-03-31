@@ -1,11 +1,13 @@
 package com.zimgo.colog.diary;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zimgo.colog.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @ToString
 @Entity
@@ -35,7 +37,12 @@ public class Diary {
 
     @ManyToOne
     @JoinColumn(name = "ownerId")
+    @JsonIgnore
     private User owner;
+
+    @ManyToMany(mappedBy = "collaboratedDiary")
+    @JsonIgnore
+    private List<User> collaborators;
 
 //
 //    @OneToMany

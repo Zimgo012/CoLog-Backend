@@ -35,7 +35,15 @@ public class User {
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     @Nullable
-    private List<Diary> diary;
+    private List<Diary> ownedDiary;
+
+    @ManyToMany
+    @JoinTable(
+            name = "collabotorsTable",
+            joinColumns = @JoinColumn(name = "collaborators"),
+            inverseJoinColumns = @JoinColumn(name = "collaboratedDiary")
+    )
+    private List<Diary> collaboratedDiary;
 
 //
 //    //private Collaborator collaborator;
