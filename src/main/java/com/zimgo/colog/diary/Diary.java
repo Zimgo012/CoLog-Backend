@@ -1,20 +1,19 @@
 package com.zimgo.colog.diary;
 
-import com.zimgo.colog.collaborator.Collaborator;
-import com.zimgo.colog.comment.Comment;
-import com.zimgo.colog.user.User;
+
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
 
+@ToString
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@Table(name = "diary")
 public class Diary {
 
     @Id
@@ -22,13 +21,16 @@ public class Diary {
     private Long id;
 
     @Column
+    private String title;
+
+    @Column
     private boolean isPublic;
 
     @Column
-    private Date createdAt;
+    private LocalDate createdAt = LocalDate.now();
 
     @Column
-    private Date modifiedAt;
+    private LocalDate modifiedAt;
 
 //    @ManyToOne
 //    @JoinColumn(name = "owner_id")

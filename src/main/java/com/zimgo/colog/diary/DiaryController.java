@@ -21,14 +21,19 @@ public class DiaryController {
         return ResponseEntity.ok(diaryService.getDiary(id));
     }
 
-    @PostMapping("/all")
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllDiary() {
+        return ResponseEntity.ok(diaryService.getAllDiary());
+    }
+
+    @PostMapping("/create")
     public ResponseEntity<?> addDiary(@RequestBody Diary diary) {
         return ResponseEntity.ok(diaryService.addDiary(diary));
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteDiary(@PathVariable Long id) {
-        diaryService.getDiary(id);
+        diaryService.deleteDiary(id);
         return ResponseEntity.ok().build();
     }
 }
