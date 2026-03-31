@@ -2,6 +2,7 @@ package com.zimgo.colog.user;
 
 import com.zimgo.colog.comment.Comment;
 import com.zimgo.colog.diary.Diary;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,8 +33,10 @@ public class User {
     //implement this later
 //    private String hashPassword;
 
-//    @OneToMany
-//    private List<Diary> diary;
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    @Nullable
+    private List<Diary> diary;
+
 //
 //    //private Collaborator collaborator;
 //    @OneToMany

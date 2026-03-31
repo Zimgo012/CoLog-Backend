@@ -1,6 +1,7 @@
 package com.zimgo.colog.diary;
 
 
+import com.zimgo.colog.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,9 +33,10 @@ public class Diary {
     @Column
     private LocalDate modifiedAt;
 
-//    @ManyToOne
-//    @JoinColumn(name = "owner_id")
-//    private User owner;
+    @ManyToOne
+    @JoinColumn(name = "ownerId")
+    private User owner;
+
 //
 //    @OneToMany
 //    private List<Comment> comments;
