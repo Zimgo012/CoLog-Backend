@@ -1,5 +1,6 @@
 package com.zimgo.colog.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zimgo.colog.comment.Comment;
 import com.zimgo.colog.diary.Diary;
 import jakarta.annotation.Nullable;
@@ -30,13 +31,17 @@ public class User {
 
     @Column
     private String email;
+
     //implement this later
-//    private String hashPassword;
+    //private String hashPassword;
+
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     @Nullable
+    @JsonIgnore
     private List<Diary> ownedDiary;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "collabotorsTable",
@@ -44,11 +49,5 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "collaboratedDiary")
     )
     private List<Diary> collaboratedDiary;
-
-//
-//    //private Collaborator collaborator;
-//    @OneToMany
-//    private List<Comment> comments;
-
 
 }
