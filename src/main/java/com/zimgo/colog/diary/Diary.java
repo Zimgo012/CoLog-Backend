@@ -2,9 +2,15 @@ package com.zimgo.colog.diary;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.zimgo.colog.messages.Messages;
 import com.zimgo.colog.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,6 +33,13 @@ public class Diary {
     private String title;
 
     @Column
+    private String content;
+
+    //Temporary
+    @OneToMany(mappedBy = "diaryId", cascade = CascadeType.ALL)
+    private List<Messages> messages;
+
+    @Column
     private boolean isPublic;
 
     @Column
@@ -43,13 +56,6 @@ public class Diary {
     @ManyToMany(mappedBy = "collaboratedDiary")
     @JsonIgnore
     private List<User> collaborators;
-
-//
-//    @OneToMany
-//    private List<Comment> comments;
-
-//    @OneToMany
-//    private List<Collaborator> collaborators;
 
 
 }
