@@ -1,17 +1,14 @@
 package com.zimgo.colog.user;
 
-import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/user")
 public class UserController {
 
-    private UserService userService;
+    public UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;

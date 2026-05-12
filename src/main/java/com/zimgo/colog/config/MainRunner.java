@@ -41,8 +41,8 @@ public class MainRunner {
             User jaden = new User(null, "Jaden", "Vance", "jvance@mail.com", new ArrayList<>(), new ArrayList<>());
             User beth = new User(null, "Beth", "Holland", "bholland@mail.com", new ArrayList<>(), new ArrayList<>());
 
-            Diary diary1 = new Diary(null, "diary1", true, LocalDate.now(), LocalDate.now(), beth,new ArrayList<>());
-            Diary diary2 = new Diary(null, "diary2", false, LocalDate.now(), LocalDate.now(), beth,new ArrayList<>());
+            Diary diary1 = new Diary(null, "diary1", "", new ArrayList<>(), true, LocalDate.now(), LocalDate.now(), beth,new ArrayList<>());
+            Diary diary2 = new Diary(null, "diary2", "", new ArrayList<>(), false, LocalDate.now(), LocalDate.now(), beth,new ArrayList<>());
 
             jaden.getCollaboratedDiary().add(diary1);
             jaden.getCollaboratedDiary().add(diary2);
@@ -69,8 +69,8 @@ public class MainRunner {
         public void run(String... args) throws Exception {
             System.out.println("DIARY - Seeding Data");
             diaryRepository.saveAll(List.of(
-                    new Diary(null, "diary3", true, LocalDate.now(), LocalDate.now(),null,new ArrayList<>()),
-                    new Diary(null, "diary4", true, LocalDate.now(), LocalDate.now(), null,new ArrayList<>())
+                    new Diary(null, "diary3", "" , new ArrayList<>(), true, LocalDate.now(), LocalDate.now(),null,new ArrayList<>()),
+                    new Diary(null, "diary4", "" , new ArrayList<>(), true, LocalDate.now(), LocalDate.now(), null,new ArrayList<>())
 
             ));
 //            System.out.println("DIARY - Seeding Data Finished");
