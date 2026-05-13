@@ -21,7 +21,7 @@ public class Messages {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-//    private MessageType type;
+    private MessageType type;
 
     private String content;
 
