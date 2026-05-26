@@ -19,7 +19,7 @@ public class Messages {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Long messageId;
 
     private MessageType type;
 
@@ -28,11 +28,12 @@ public class Messages {
     private LocalDateTime timestamp;
 
     @ManyToOne
+    @JsonIgnore
     private User sender;
 
     @ManyToOne
     @JsonIgnore
-    private Diary diaryId;
+    private Diary diary;
 
 
 }

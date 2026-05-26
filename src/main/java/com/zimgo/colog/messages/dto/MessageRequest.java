@@ -14,4 +14,6 @@ public class MessageRequest {
     private Long senderId;
 
     private MessageType type;
+
+    private Long documentId;
 }

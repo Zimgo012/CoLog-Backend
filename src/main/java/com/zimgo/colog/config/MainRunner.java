@@ -2,6 +2,8 @@ package com.zimgo.colog.config;
 
 import com.zimgo.colog.diary.Diary;
 import com.zimgo.colog.diary.DiaryRepository;
+import com.zimgo.colog.document.Document;
+import com.zimgo.colog.document.DocumentRepository;
 import com.zimgo.colog.user.User;
 import com.zimgo.colog.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -11,6 +13,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,9 +27,11 @@ public class MainRunner {
     class UserSeeder implements CommandLineRunner {
 
         public UserRepository userRepository;
+        public DocumentRepository documentRepository;
 
-        public UserSeeder(UserRepository userRepository) {
+        public UserSeeder(UserRepository userRepository, DocumentRepository documentRepository) {
             this.userRepository = userRepository;
+            this.documentRepository = documentRepository;
         }
 
         @Override
@@ -41,8 +46,17 @@ public class MainRunner {
             User jaden = new User(null, "Jaden", "Vance", "jvance@mail.com", new ArrayList<>(), new ArrayList<>());
             User beth = new User(null, "Beth", "Holland", "bholland@mail.com", new ArrayList<>(), new ArrayList<>());
 
-            Diary diary1 = new Diary(null, "diary1", "", new ArrayList<>(), true, LocalDate.now(), LocalDate.now(), beth,new ArrayList<>());
-            Diary diary2 = new Diary(null, "diary2", "", new ArrayList<>(), false, LocalDate.now(), LocalDate.now(), beth,new ArrayList<>());
+            Diary diary1 = new Diary(null, "diary1", "", new ArrayList<>(), true, LocalDate.now(), LocalDate.now(), beth,new ArrayList<>(),new ArrayList<>());
+            Diary diary2 = new Diary(null, "diary2", "", new ArrayList<>(), false, LocalDate.now(), LocalDate.now(), beth,new ArrayList<>(),new ArrayList<>());
+            Document doc1 = new Document();
+
+            doc1.setDate(LocalDateTime.now());
+
+            doc1.setContent("Initial document content");
+
+            doc1.setDiary(diary1);
+
+            documentRepository.save(doc1);
 
             jaden.getCollaboratedDiary().add(diary1);
             jaden.getCollaboratedDiary().add(diary2);
@@ -69,8 +83,8 @@ public class MainRunner {
         public void run(String... args) throws Exception {
             System.out.println("DIARY - Seeding Data");
             diaryRepository.saveAll(List.of(
-                    new Diary(null, "diary3", "" , new ArrayList<>(), true, LocalDate.now(), LocalDate.now(),null,new ArrayList<>()),
-                    new Diary(null, "diary4", "" , new ArrayList<>(), true, LocalDate.now(), LocalDate.now(), null,new ArrayList<>())
+                    new Diary(null, "diary3", "" , new ArrayList<>(), true, LocalDate.now(), LocalDate.now(),null,new ArrayList<>(),new ArrayList<>()),
+                    new Diary(null, "diary4", "" , new ArrayList<>(), true, LocalDate.now(), LocalDate.now(), null,new ArrayList<>(),new ArrayList<>())
 
             ));
 //            System.out.println("DIARY - Seeding Data Finished");

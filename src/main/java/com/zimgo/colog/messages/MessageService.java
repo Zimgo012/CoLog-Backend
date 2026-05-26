@@ -4,9 +4,10 @@ import com.zimgo.colog.diary.Diary;
 import com.zimgo.colog.diary.DiaryService;
 import com.zimgo.colog.messages.dto.MessageRequest;
 import com.zimgo.colog.messages.dto.MessageRespond;
+import com.zimgo.colog.document.Document;
+import com.zimgo.colog.document.DocumentService;
 import com.zimgo.colog.user.User;
 import com.zimgo.colog.user.UserService;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,16 +22,20 @@ public class MessageService {
     public UserService userService;
     public DiaryService diaryService;
 
+    public DocumentService documentService;
+
 
     public MessageService(MessageRepository messageRepository,
                           SimpMessagingTemplate messagingTemplate,
                           UserService userService,
-                          DiaryService diaryService) {
+                          DiaryService diaryService,
+                          DocumentService documentService) {
 
         this.messageRepository = messageRepository;
         this.messagingTemplate = messagingTemplate;
         this.userService = userService;
         this.diaryService = diaryService;
+        this.documentService = documentService;
     }
 
     /**
@@ -40,7 +45,7 @@ public class MessageService {
         Messages message = new Messages();
         message.setContent(content);
         message.setSender(sender);
-        message.setDiaryId(diary);
+        message.setDiary(diary);
         message.setTimestamp(LocalDateTime.now());
 
         return message;
@@ -54,7 +59,7 @@ public class MessageService {
 
         MessageRespond res = new MessageRespond();
         res.setContent(content);
-        res.setSenderId(sender.getId());
+        res.setSenderId(sender.getUserId());
         res.setSenderName(sender.getFirstName() + " " + sender.getLastName());
         res.setTimestamp(LocalDateTime.now());
 
@@ -99,7 +104,19 @@ public class MessageService {
      */
     public void processDocumentMessage(Long diaryId, MessageRequest req){
 
-        messagingTemplate.convertAndSend("/topic/diary/" + diaryId + "/document");
+
+        System.out.println("📥 DOCUMENT MESSAGE RECEIVED");
+
+        System.out.println(req.getContent());
+        User sender = userService.getUserById(req.getSenderId());
+
+        // later, sender information and other metadata will be used as metadata for edits
+
+        documentService.editDocument(diaryId,req.getDocumentId(),req.getContent());
+
+        Document doc = documentService.getDocument(req.getDocumentId());
+
+        messagingTemplate.convertAndSend("/topic/diary/" + diaryId + "/document", doc.getContent());
     }
 
     /**
