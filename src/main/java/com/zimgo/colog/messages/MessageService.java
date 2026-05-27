@@ -12,6 +12,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 @Service
@@ -102,21 +106,23 @@ public class MessageService {
      * @param diaryId - the id of the diary
      * @param req - the message dto from client
      */
-    public void processDocumentMessage(Long diaryId, MessageRequest req){
+    public void processDocumentMessage(Long diaryId, MessageRequest req) throws IOException {
 
 
         System.out.println("📥 DOCUMENT MESSAGE RECEIVED");
 
         System.out.println(req.getContent());
+
         User sender = userService.getUserById(req.getSenderId());
 
         // later, sender information and other metadata will be used as metadata for edits
 
         documentService.editDocument(diaryId,req.getDocumentId(),req.getContent());
 
-        Document doc = documentService.getDocument(req.getDocumentId());
+//        Document doc = documentService.getDocument(req.getDocumentId());
+        String content = getContent(diaryId, req.getDocumentId());
 
-        messagingTemplate.convertAndSend("/topic/diary/" + diaryId + "/document", doc.getContent());
+        messagingTemplate.convertAndSend("/topic/diary/" + diaryId + "/document", content);
     }
 
     /**
@@ -141,5 +147,16 @@ public class MessageService {
         messagingTemplate.convertAndSend("/topic/diary/" + diaryId + "/file");
     }
 
+    //Ultility method to extract file content in a file
+    private String getContent(Long diaryId, Long documentId) throws IOException {
+        Path filePath = Paths.get("storage", "diaryId-" + diaryId)
+                .resolve("document-" + documentId + ".txt");
+
+        if (!Files.exists(filePath)) {
+            return "";
+        }
+
+        return Files.readString(filePath);
+    }
 
 }

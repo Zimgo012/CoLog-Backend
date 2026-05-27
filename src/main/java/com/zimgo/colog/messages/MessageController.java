@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.io.IOException;
 
 
 @Controller
@@ -26,13 +27,14 @@ public class MessageController {
 
     @MessageMapping("/diary/session/{diaryId}")
     public void userMessage(@DestinationVariable Long diaryId,
-                            @Payload MessageRequest req) {
+                            @Payload MessageRequest req) throws IOException {
 
             if (req.getType() == null){
                 throw new RuntimeException("Message type is null!");
             }
 
             switch (req.getType()) {
+
                 case DOCUMENT -> messageService.processDocumentMessage(diaryId, req);
                 case CHAT -> messageService.processChatMessage(diaryId,req);
                 case LEAVE -> messageService.processLeaveMessage(diaryId);
