@@ -9,11 +9,7 @@ import lombok.Setter;
 @Setter
 public class MessageRequest {
 
-    private String content;
-
-    private Long senderId;
-
     private MessageType type;
 
-    private Long documentId;
+    private Object payload;
 }
