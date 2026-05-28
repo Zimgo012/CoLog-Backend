@@ -5,8 +5,10 @@ public enum MessageType {
     /* Document type message - will update the document inside the diary. used for collaborative editing */
     DOCUMENT,
 
-    /* Chat type message - will send a message to the diary room */
+    /* To track user presence*/
+    PRESENCE,
 
+    /* Chat type message - will send a message to the diary room */
     CHAT,
     /* Leave and join message - will notify the diary room  */
     LEAVE,

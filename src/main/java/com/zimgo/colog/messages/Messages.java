@@ -8,6 +8,8 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+
+//Todo: this is the chat model, transfer this to chat model
 @ToString
 @Entity
 @Getter
@@ -23,6 +25,7 @@ public class Messages {
 
     private MessageType type;
 
+    //Todo:  break down this to document
     private String content;
 
     private LocalDateTime timestamp;
