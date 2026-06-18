@@ -26,6 +26,6 @@ public class PresenceMessageService {
         this.messagingTemplate = messagingTemplate;
     }
     public void processPresenceMessage(Long diaryId, Long documentId, PresencePayload payload){
-        messagingTemplate.convertAndSend("/topic/diary/" + diaryId +"/documentId/" + documentId + "/com/zimgo/colog/presence",payload);
+        messagingTemplate.convertAndSend("/topic/diary/" + diaryId +"/documentId/" + documentId + "/presence",payload);
     }
 }

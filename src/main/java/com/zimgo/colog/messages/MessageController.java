@@ -3,6 +3,7 @@ package com.zimgo.colog.messages;
 import com.zimgo.colog.messages.dto.payloads.ChatPayload;
 import com.zimgo.colog.messages.dto.payloads.DocumentPayload;
 import com.zimgo.colog.messages.dto.MessageRequest;
+import com.zimgo.colog.messages.dto.payloads.OperationPayload;
 import com.zimgo.colog.messages.dto.payloads.PresencePayload;
 import com.zimgo.colog.messages.services.MessageService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -39,15 +40,21 @@ public class MessageController {
             throw new RuntimeException("Message type is null!");
         }
 
+        System.out.println(req.getType());
         switch (req.getType()) {
 
-            case DOCUMENT -> {
-                DocumentPayload payload = objectMapper.convertValue(req.getPayload(), DocumentPayload.class);
-                messageService.processDocumentMessage(diaryId, payload);
+            case COLLABORATION -> {
+                OperationPayload payload = objectMapper.convertValue(req.getPayload(), OperationPayload.class);
+                messageService.processCollaborationMessage(diaryId, payload);
             }
             case PRESENCE -> {
                 PresencePayload payload = objectMapper.convertValue(req.getPayload(), PresencePayload.class);
-                messageService.processPresenceMessage(diaryId, payload);
+
+                messageService.processPresenceMessage(
+                        diaryId,
+                        payload.getDocumentId(),
+                        payload
+                );
             }
             case CHAT -> {
                 ChatPayload payload = objectMapper.convertValue(req.getPayload(), ChatPayload.class);

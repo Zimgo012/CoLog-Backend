@@ -4,6 +4,7 @@ public enum MessageType {
 
     /* Document type message - will update the document inside the diary. used for collaborative editing */
     DOCUMENT,
+    COLLABORATION,
 
     /* To track user presence*/
     PRESENCE,
