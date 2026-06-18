@@ -5,6 +5,7 @@
 package com.zimgo.colog.document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.zimgo.colog.deltaLog.DeltaLog;
 import com.zimgo.colog.diary.Diary;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "documents")
@@ -29,11 +31,12 @@ public class Document {
     @Column
     public LocalDateTime date;
 
-    @Column(length = 1000)
-    public String content;
-
     @ManyToOne
     @JsonIgnore
     public Diary diary;
+
+    //recent deltalog will be the revision
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
+    public List<DeltaLog> deltaLogs;
 
 }

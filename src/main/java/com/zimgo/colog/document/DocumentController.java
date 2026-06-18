@@ -24,4 +24,9 @@ public class DocumentController {
                 documentService.getDiaryDocuments(diaryId)
         );
     }
+
+    @GetMapping("/{documentId}")
+    public ResponseEntity<?> getDocument(@PathVariable Long documentId) {
+        return ResponseEntity.ok(documentService.getDocument(documentId));
+    }
 }
