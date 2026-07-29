@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Service
-public class LWWSequencerService {
+public class DocumentSequencerService {
 
     /**
      * Long - DocumentId
