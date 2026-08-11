@@ -8,4 +8,9 @@ import java.util.List;
 @Repository
 public interface OperationRepository extends JpaRepository<Operation, Long> {
 
+    List<Operation> findByDocumentDocumentIdAndAppliedRevisionGreaterThanOrderByAppliedRevisionAsc(
+            Long documentId,
+            Long baseRevision
+    );
+
 }

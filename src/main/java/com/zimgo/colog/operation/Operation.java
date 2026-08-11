@@ -3,7 +3,6 @@ package com.zimgo.colog.operation;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zimgo.colog.deltaLog.DeltaLog;
 import com.zimgo.colog.document.Document;
-import com.zimgo.colog.messages.dto.payloads.enums.OperationType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,7 +34,11 @@ public class Operation {
     // TODO: string for now  change this later
     // private String user;
 
+    @Enumerated(EnumType.STRING)
     private OperationType operationType;
+
+    private Long baseRevision;
+    private Long appliedRevision;
 
     //payload
     private int index;

@@ -2,6 +2,8 @@ package com.zimgo.colog.operation;
 
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class OperationService {
     public OperationRepository operationRepository;
@@ -37,7 +39,15 @@ public class OperationService {
         operationRepository.save(operation);
     }
 
-
+    public List<Operation> getMissingOperations(
+            Long documentId,
+            Long baseRevision
+    ){
+        return operationRepository.findByDocumentDocumentIdAndAppliedRevisionGreaterThanOrderByAppliedRevisionAsc(
+                documentId,
+                baseRevision
+        );
+    }
 
 
 }

@@ -16,4 +16,5 @@ public class OperationDTO {
     private String text;
     private int length;
     private LocalDateTime timestamp;
+    private Long revision;
 }
