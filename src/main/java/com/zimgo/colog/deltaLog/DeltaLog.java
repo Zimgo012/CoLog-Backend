@@ -40,4 +40,7 @@ public class DeltaLog {
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt;
 
+    private Long startRevision = 0L;
+    private Long endRevision = 0L;
+
 }

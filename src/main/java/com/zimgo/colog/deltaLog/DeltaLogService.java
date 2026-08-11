@@ -54,6 +54,11 @@ public class DeltaLogService {
         */
     }
 
+
+    public void saveDeltalog(DeltaLog log){
+        deltaLogRepository.save(log);
+    }
+
     // Apply a new operation
     public void applyOperation(Operation op, DeltaLog log) throws IOException {
 
@@ -75,7 +80,16 @@ public class DeltaLogService {
         // 2. Create new DeltaLog
         DeltaLog newLog = new DeltaLog();
         newLog.setDocument(oldLog.getDocument());
+
         newLog.setCreatedAt(LocalDateTime.now());
+
+        Document doc = newLog.getDocument();
+
+        //revision number update
+        oldLog.setEndRevision(doc.getCurrentRevision());
+        deltaLogRepository.save(oldLog);
+        newLog.setStartRevision(doc.getCurrentRevision() + 1);
+        newLog.setEndRevision(doc.getCurrentRevision() + 1);
 
         // 3. Save first to generate ID
         deltaLogRepository.save(newLog);
@@ -115,6 +129,8 @@ public class DeltaLogService {
 
         DeltaLog log = new DeltaLog();
         log.setDocument(doc);
+        log.setStartRevision(doc.getCurrentRevision());
+        log.setEndRevision(doc.getCurrentRevision());
         log.setCreatedAt(LocalDateTime.now());
         log.setOperations(new ArrayList<>());
 
