@@ -78,36 +78,55 @@ public class OTResolver {
         };
     }
 
+    // INSERT
     private Operation transformInsertAgainstInsert(Operation incoming, Operation previous){
-            if (previous.getIndex() <= incoming.getIndex()) {
-                incoming.setIndex(previous.getLength() + incoming.getIndex());
-            }
+        int incomingStart = incoming.getIndex();
+        int incomingEnd = incomingStart + incoming.getLength();
 
+        int previousStart = previous.getIndex();
+        int previousEnd = previousStart + previous.getLength();
 
-            return  incoming;
-    }
-
-    private Operation transformInsertAgainstDelete(Operation incoming, Operation previous){
-
-        int startIndex = incoming.getIndex();
-        int deleteStart = previous.getIndex();
-        int deleteEnd = previous.getIndex() + previous.getLength();
-
-        //if inserting after all deleted characters
-        if (startIndex >= deleteEnd){
-            incoming.setIndex(incoming.getIndex() - previous.getIndex());
-
-        //if inserting inside the characters
-        }else if (startIndex >= deleteStart && startIndex < deleteEnd){
-
-            //Just insert at the end
-            incoming.setIndex(deleteEnd);
+        if(previousStart <= incomingStart){
+            incoming.setIndex(previous.getLength() + incoming.getIndex());
         }
 
         return  incoming;
     }
 
+    private Operation transformInsertAgainstDelete(Operation incoming, Operation previous){
+
+        int incomingStart = incoming.getIndex();
+        int incomingEnd = incomingStart + incoming.getLength();
+
+        int previousStart = previous.getIndex();
+        int previousEnd = previousStart + previous.getLength();
+
+
+        //if inserting after all deleted characters
+        if (incomingStart >= previousEnd) {
+            incoming.setIndex(incoming.getIndex() - previous.getIndex());
+
+            //if inserting inside the characters
+        }else if (incomingStart >= previousStart && incomingStart < previousEnd){
+
+            //Just insert at the end
+            incoming.setIndex(previousEnd);
+        }
+
+        return  incoming;
+    }
+
+
+    //DELETE
     private Operation transformDeleteAgainstInsert(Operation incoming, Operation previous){
+
+        int incomingStart = incoming.getIndex();
+        int incomingEnd = incomingStart + incoming.getLength();
+
+        int previousStart = previous.getIndex();
+        int previousEnd = previousStart + previous.getLength();
+
+
         if (previous.getIndex() < incoming.getIndex()) {
             incoming.setIndex(previous.getLength() + incoming.getIndex());
         }
@@ -134,6 +153,7 @@ public class OTResolver {
         }else if(incomingStartIndex >= previousStartIndex
                 && incomingStartIndex < previousEndIndex
                 && incomingEndIndex > previousEndIndex){
+
             incoming.setIndex(previousStartIndex);
             incoming.setLength(incomingEndIndex - previousEndIndex);
 
@@ -146,8 +166,6 @@ public class OTResolver {
             );
         }
 
-
-
         else if(incomingStartIndex < previousStartIndex && incomingEndIndex > previousEndIndex){
 
             Operation merged = splitMerge(incoming, previous);
@@ -158,9 +176,9 @@ public class OTResolver {
         return incoming;
     }
 
-    private Operation splitMerge(
-            Operation incoming,
-            Operation previous) {
+
+    private Operation splitMerge(Operation incoming, Operation previous)
+    {
 
         int pStart = previous.getIndex();
         int pEnd = previous.getIndex() + previous.getLength();
@@ -176,11 +194,21 @@ public class OTResolver {
         int rightStart = pEnd;
         int rightEnd = iEnd;
 
-        // Shift because previous delete collapsed the document
+
         int shift = previous.getLength();
 
-        rightStart -= shift;
-        rightEnd -= shift;
+        switch (previous.getOperationType()){
+            case INSERT -> {
+                rightStart += shift;
+                rightEnd += shift;
+            }
+
+            case DELETE -> {
+                rightStart -= shift;
+                rightEnd -= shift;
+            }
+
+        }
 
         // Merge
         incoming.setIndex(leftStart);
