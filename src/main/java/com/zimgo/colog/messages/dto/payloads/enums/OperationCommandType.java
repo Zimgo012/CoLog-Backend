@@ -1,6 +1,6 @@
 package com.zimgo.colog.messages.dto.payloads.enums;
 
-public enum OperationType {
+public enum OperationCommandType {
 
     INSERT,
     DELETE,
