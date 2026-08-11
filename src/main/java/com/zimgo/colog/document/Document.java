@@ -35,6 +35,9 @@ public class Document {
     @JsonIgnore
     public Diary diary;
 
+    @Column(nullable = false)
+    public Long currentRevision = 0L;
+
     //recent deltalog will be the revision
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
     public List<DeltaLog> deltaLogs;

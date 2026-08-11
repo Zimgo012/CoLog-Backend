@@ -50,7 +50,9 @@ public class DocumentService {
         documentRepository.save(document);
     }
 
-
+    public void incrementDocRevision(Document doc){
+        doc.setCurrentRevision(doc.getCurrentRevision() + 1);
+    }
 
 
 }
