@@ -1,10 +1,7 @@
 package com.zimgo.colog.messages.services;
 
 import com.zimgo.colog.messages.dto.MessageRequest;
-import com.zimgo.colog.messages.dto.payloads.ChatPayload;
-import com.zimgo.colog.messages.dto.payloads.DocumentPayload;
-import com.zimgo.colog.messages.dto.payloads.OperationPayload;
-import com.zimgo.colog.messages.dto.payloads.PresencePayload;
+import com.zimgo.colog.messages.dto.payloads.*;
 import com.zimgo.colog.messages.services.subservices.*;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +10,6 @@ import java.io.IOException;
 @Service
 public class MessageService {
 
-    private final CollaborationMessageService collaborationMessageService;
     public ChatMessageService chatMessageService;
 
     public DocumentMessageService documentMessageService;
@@ -24,13 +20,16 @@ public class MessageService {
 
     public PresenceMessageService presenceMessageService;
 
-    public MessageService(ChatMessageService chatMessageService, DocumentMessageService documentMessageService, FileMessageService fileMessageService, NotificationMessageService notificationMessageService, PresenceMessageService presenceMessageService, CollaborationMessageService collaborationMessageService) {
+    public YjsMessageService yjsMessageService;
+
+    public MessageService(ChatMessageService chatMessageService, DocumentMessageService documentMessageService, FileMessageService fileMessageService, NotificationMessageService notificationMessageService, PresenceMessageService presenceMessageService, YjsMessageService yjsMessageService) {
         this.chatMessageService = chatMessageService;
         this.documentMessageService = documentMessageService;
         this.fileMessageService = fileMessageService;
         this.notificationMessageService = notificationMessageService;
         this.presenceMessageService = presenceMessageService;
-        this.collaborationMessageService = collaborationMessageService;
+        this.yjsMessageService = yjsMessageService;
+
     }
 
     public void processChatMessage(Long diaryId, ChatPayload payload){
@@ -56,8 +55,8 @@ public class MessageService {
         fileMessageService.processFileMessage(diaryId, fileName);
     }
 
-    public void processCollaborationMessage(Long diaryId, OperationPayload operationPayload) throws IOException {
-        collaborationMessageService.processCollaborationMessage(diaryId, operationPayload);
+    public void processYjsUpdate(Long diaryId, Long documentId, YjsPayload yjsPayload){
+        yjsMessageService.processYjsMessage(diaryId, documentId, yjsPayload);
     }
 
 }

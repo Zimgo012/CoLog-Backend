@@ -2,10 +2,6 @@ package com.zimgo.colog.messages;
 
 public enum MessageType {
 
-    /* Document type message - will update the document inside the diary. used for collaborative editing */
-    DOCUMENT,
-    COLLABORATION,
-
     /* To track user presence*/
     PRESENCE,
 
@@ -16,5 +12,8 @@ public enum MessageType {
     JOIN,
 
     /* File type message - will send a file to the diary room*/
-    FILE
+    FILE,
+
+    /* Crdt update message using y.js payload */
+    YJSUPDATE
 }

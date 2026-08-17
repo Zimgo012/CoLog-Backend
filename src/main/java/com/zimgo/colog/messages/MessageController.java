@@ -1,11 +1,9 @@
 package com.zimgo.colog.messages;
 
-import com.zimgo.colog.messages.dto.payloads.ChatPayload;
-import com.zimgo.colog.messages.dto.payloads.DocumentPayload;
+import com.zimgo.colog.messages.dto.payloads.*;
 import com.zimgo.colog.messages.dto.MessageRequest;
-import com.zimgo.colog.messages.dto.payloads.OperationPayload;
-import com.zimgo.colog.messages.dto.payloads.PresencePayload;
 import com.zimgo.colog.messages.services.MessageService;
+import com.zimgo.colog.messages.services.subservices.YjsMessageService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -41,12 +39,9 @@ public class MessageController {
         }
 
         System.out.println(req.getType());
+
         switch (req.getType()) {
 
-            case COLLABORATION -> {
-                OperationPayload payload = objectMapper.convertValue(req.getPayload(), OperationPayload.class);
-                messageService.processCollaborationMessage(diaryId, payload);
-            }
             case PRESENCE -> {
                 PresencePayload payload = objectMapper.convertValue(req.getPayload(), PresencePayload.class);
 
@@ -56,6 +51,13 @@ public class MessageController {
                         payload
                 );
             }
+
+            //CRDT update using y.js
+            case YJSUPDATE->{
+                YjsPayload payload = objectMapper.convertValue(req.getPayload(), YjsPayload.class);
+                messageService.processYjsUpdate(diaryId, payload.getDocumentId(), payload);
+            }
+
             case CHAT -> {
                 ChatPayload payload = objectMapper.convertValue(req.getPayload(), ChatPayload.class);
                 messageService.processChatMessage(diaryId, payload);

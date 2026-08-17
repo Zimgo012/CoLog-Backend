@@ -1,6 +1,6 @@
 package com.zimgo.colog.messages.dto.payloads;
 
-import com.zimgo.colog.messages.MessageType;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,12 +8,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Setter
 @Getter
-public class PresencePayload {
+public class YjsPayload {
 
     private Long senderId;
 
     private Long documentId;
 
-    private byte[] awareness;
-
+    private byte[] yjs;
 }
