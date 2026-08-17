@@ -50,13 +50,4 @@ public class DiaryController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{id}/messages")
-    public ResponseEntity<?> getDiaryMessages(@PathVariable Long id) {
-
-        Diary diary = diaryService.getDiary(id);
-
-        return ResponseEntity.ok(diary.getMessages());
-    }
-
-
 }

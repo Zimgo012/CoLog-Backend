@@ -31,10 +31,6 @@ public class Diary {
     @Column
     private String content;
 
-    //Temporary
-    @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL)
-    private List<Messages> messages;
-
     @Column
     private boolean isPublic;
 
