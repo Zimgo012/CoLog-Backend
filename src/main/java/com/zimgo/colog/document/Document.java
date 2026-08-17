@@ -5,7 +5,6 @@
 package com.zimgo.colog.document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.zimgo.colog.deltaLog.DeltaLog;
 import com.zimgo.colog.diary.Diary;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -35,8 +34,11 @@ public class Document {
     @JsonIgnore
     public Diary diary;
 
-    //recent deltalog will be the revision
-    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
-    public List<DeltaLog> deltaLogs;
+    @Column(
+            name = "yjs_state",
+            columnDefinition = "bytea"
+    )
+    private byte[] yjsState;
+
 
 }
