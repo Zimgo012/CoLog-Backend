@@ -29,4 +29,26 @@ public class DocumentController {
     public ResponseEntity<?> getDocument(@PathVariable Long documentId) {
         return ResponseEntity.ok(documentService.getDocument(documentId));
     }
+
+    /**
+     * Used to update yjs state from server to client
+     * @return
+     */
+    @GetMapping( "/{documentId}/yjs")
+    public ResponseEntity<?> getState(@PathVariable Long documentId){
+        return ResponseEntity.ok(documentService.getYjsState(documentId));
+    }
+
+    /**
+     * Used to update yjs state from client to server
+     * @return
+     */
+    @PostMapping(value = "/{documentId}/yjs",
+            consumes = "application/octet-stream")
+    public ResponseEntity<?> saveState(@PathVariable Long documentId,
+                                       @RequestBody byte[] update){
+      documentService.saveYjsState(documentId, update);
+
+      return ResponseEntity.ok().build();
+    }
 }

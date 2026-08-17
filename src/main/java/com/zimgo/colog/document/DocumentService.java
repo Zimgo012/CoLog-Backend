@@ -1,6 +1,5 @@
 package com.zimgo.colog.document;
 
-import com.zimgo.colog.deltaLog.DeltaLogService;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -8,12 +7,11 @@ import java.util.List;
 
 @Service
 public class DocumentService {
-    private final DeltaLogService deltaLogService;
+
     public DocumentRepository documentRepository;
 
-    public DocumentService(DocumentRepository documentRepository, DeltaLogService deltaLogService) {
+    public DocumentService(DocumentRepository documentRepository) {
         this.documentRepository = documentRepository;
-        this.deltaLogService = deltaLogService;
     }
 
     // Functions
@@ -29,7 +27,6 @@ public class DocumentService {
     public Document createDocument(Document document) throws IOException {
         Document savedDoc = documentRepository.save(document);
 
-        deltaLogService.createInitialLog(document);
         return savedDoc;
     }
 
@@ -48,6 +45,19 @@ public class DocumentService {
 
     public void saveDocument(Document document) {
         documentRepository.save(document);
+    }
+
+    public void saveYjsState(Long documentId, byte[] state){
+        Document document = documentRepository.findById(documentId).orElseThrow();
+
+        document.setYjsState(state);
+        saveDocument(document);
+
+    }
+
+    public byte[] getYjsState(Long documentId){
+        Document document = documentRepository.findById(documentId).orElseThrow();
+        return document.getYjsState();
     }
 
 
