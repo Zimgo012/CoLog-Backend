@@ -1,6 +1,5 @@
 package com.zimgo.colog.config;
 
-import com.zimgo.colog.deltaLog.DeltaLogService;
 import com.zimgo.colog.diary.Diary;
 import com.zimgo.colog.diary.DiaryRepository;
 import com.zimgo.colog.document.Document;
@@ -23,11 +22,9 @@ import java.util.List;
 @Component
 public class MainRunner {
 
-    private final DeltaLogService deltaLogService;
     private final DocumentService documentService;
 
-    public MainRunner(DeltaLogService deltaLogService, DocumentService documentService) {
-        this.deltaLogService = deltaLogService;
+    public MainRunner( DocumentService documentService) {
         this.documentService = documentService;
     }
 
@@ -71,7 +68,6 @@ public class MainRunner {
                     null,
                     "diary1",
                     "",
-                    new ArrayList<>(),
                     true,
                     LocalDate.now(),
                     LocalDate.now(),
@@ -84,7 +80,6 @@ public class MainRunner {
                     null,
                     "diary2",
                     "",
-                    new ArrayList<>(),
                     false,
                     LocalDate.now(),
                     LocalDate.now(),
@@ -131,8 +126,8 @@ public class MainRunner {
         public void run(String... args) throws Exception {
             System.out.println("DIARY - Seeding Data");
             diaryRepository.saveAll(List.of(
-                    new Diary(null, "diary3", "" , new ArrayList<>(), true, LocalDate.now(), LocalDate.now(),null,new ArrayList<>(),new ArrayList<>()),
-                    new Diary(null, "diary4", "" , new ArrayList<>(), true, LocalDate.now(), LocalDate.now(), null,new ArrayList<>(),new ArrayList<>())
+                    new Diary(null, "diary3", "" ,  true, LocalDate.now(), LocalDate.now(),null,new ArrayList<>(),new ArrayList<>()),
+                    new Diary(null, "diary4", "" ,  true, LocalDate.now(), LocalDate.now(), null,new ArrayList<>(),new ArrayList<>())
 
             ));
 //            System.out.println("DIARY - Seeding Data Finished");
