@@ -32,8 +32,12 @@ public class User {
     @Column
     private String email;
 
-    //implement this later
-    //private String hashPassword;
+    @Column
+    private String password;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
