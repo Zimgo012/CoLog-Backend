@@ -1,6 +1,8 @@
 package com.zimgo.colog.auth.security;
 
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +13,13 @@ import java.util.Date;
     public class JWTService {
 
 
-        private final SecretKey secretKey = Jwts.SIG.HS256.key().build();
+        private final JWTProperties jwtProperties;
+        private final SecretKey secretKey;
+
+        public JWTService(JWTProperties jwtProperties){
+            this.jwtProperties = jwtProperties;
+            this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.getSecret()));
+        }
 
         public String generateToken(UserDetails userDetails){
 
@@ -19,8 +27,7 @@ import java.util.Date;
                     .subject(userDetails.getUsername())
                     .issuedAt(new Date())
                     .expiration(
-                            new Date(System.currentTimeMillis() + 1000 * 60 * 60
-                            )
+                            new Date(System.currentTimeMillis() + jwtProperties.getExpiration())
                     )
                     .signWith(secretKey)
                     .compact();

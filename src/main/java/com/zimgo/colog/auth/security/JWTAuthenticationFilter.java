@@ -1,5 +1,6 @@
 package com.zimgo.colog.auth.security;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,34 +35,38 @@ import java.io.IOException;
             String authHeader = request.getHeader("Authorization");
 
             // 2.2 if first time login (no token yet) proceed to sign in with spring security
-            if (authHeader == null || !authHeader.startsWith("Bearer ")){
-                filterChain.doFilter(request,response);
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                filterChain.doFilter(request, response);
                 return;
             }
 
-           // 2.3 Check for token
-           // Bearer: Example123
-           //  -> extract only Example123
+            // 2.3 Check for token
+            // Bearer: Example123
+            //  -> extract only Example123
             String jwt = authHeader.substring(7);
 
             // 2.4 Extract username from token
-            String username = jwtService.extractUsername(jwt);
 
-            // 2.5 load username to security context
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            try {
+                String username = jwtService.extractUsername(jwt);
 
-            // 2.6 Validate the JWT
-            if (jwtService.isValidToken(jwt,userDetails)){
+                // 2.5 load username to security context
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                // 2.6.1 if its valid, create authentication
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, //payload
-                        null, // credentials
-                        userDetails.getAuthorities()); //
+                // 2.6 Validate the JWT
+                if (jwtService.isValidToken(jwt, userDetails)) {
 
-                // 2.6.2 Store in Security Context
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+                    // 2.6.1 if its valid, create authentication
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails, //payload
+                            null, // credentials
+                            userDetails.getAuthorities()); //
+
+                    // 2.6.2 Store in Security Context
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+
+            } catch (JwtException e){response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);}
 
             filterChain.doFilter(request,response);
 
