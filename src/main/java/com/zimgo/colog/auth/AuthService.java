@@ -37,7 +37,7 @@ public class AuthService {
 
         //Authenticate new user
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
+                new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtService.generateToken(userDetails);
@@ -51,6 +51,7 @@ public class AuthService {
         User user = new User();
         user.setFirstName(req.getFirstName());
         user.setLastName(req.getLastName());
+        user.setUsername(req.getUsername());
         user.setEmail(req.getEmail());
         user.setRole(UserRole.USER);
         user.setPassword(passwordEncoder.encode(req.getPassword()));
