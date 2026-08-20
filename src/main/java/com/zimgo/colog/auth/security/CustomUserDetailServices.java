@@ -1,4 +1,4 @@
-package com.zimgo.colog.auth;
+package com.zimgo.colog.auth.security;
 
 import com.zimgo.colog.user.User;
 import com.zimgo.colog.user.UserService;
