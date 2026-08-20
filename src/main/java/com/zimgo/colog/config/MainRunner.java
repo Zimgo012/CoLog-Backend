@@ -7,10 +7,12 @@ import com.zimgo.colog.document.DocumentRepository;
 import com.zimgo.colog.document.DocumentService;
 import com.zimgo.colog.user.User;
 import com.zimgo.colog.user.UserRepository;
+import com.zimgo.colog.user.UserRole;
 import jakarta.transaction.Transactional;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.cglib.core.Local;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -23,9 +25,12 @@ import java.util.List;
 public class MainRunner {
 
     private final DocumentService documentService;
-
-    public MainRunner( DocumentService documentService) {
+    private final PasswordEncoder passwordEncoder;
+    public MainRunner(DocumentService documentService,
+    PasswordEncoder passwordEncoder) {
         this.documentService = documentService;
+        this.passwordEncoder = passwordEncoder;
+
     }
 
     @Component
@@ -49,16 +54,16 @@ public class MainRunner {
             System.out.println("USER - Seeding Data");
 
             // ---------------- USERS ----------------
-            User john = new User(null, "John", "Doe", "jdoe@mail.com",
+            User john = new User(null, "John", "Doe", "jdoe@mail.com", passwordEncoder.encode("john123"), UserRole.USER,
                     new ArrayList<>(), new ArrayList<>());
 
-            User ellen = new User(null, "Ellen", "Green", "egreen@mail.com",
+            User ellen = new User(null, "Ellen", "Green", "egreen@mail.com","",UserRole.ADMIN,
                     new ArrayList<>(), new ArrayList<>());
 
-            User jaden = new User(null, "Jaden", "Vance", "jvance@mail.com",
+            User jaden = new User(null, "Jaden", "Vance", "jvance@mail.com","",UserRole.USER,
                     new ArrayList<>(), new ArrayList<>());
 
-            User beth = new User(null, "Beth", "Holland", "bholland@mail.com",
+            User beth = new User(null, "Beth", "Holland", "bholland@mail.com","",UserRole.ADMIN,
                     new ArrayList<>(), new ArrayList<>());
 
             userRepository.saveAll(List.of(john, ellen, jaden, beth));
