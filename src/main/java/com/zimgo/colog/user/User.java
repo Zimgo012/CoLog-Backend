@@ -3,6 +3,7 @@ package com.zimgo.colog.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zimgo.colog.comment.Comment;
 import com.zimgo.colog.diary.Diary;
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,6 +31,9 @@ public class User {
     private String lastName;
 
     @Column
+    private String username;
+
+    @Column
     private String email;
 
     @Column
@@ -46,6 +50,7 @@ public class User {
     private List<Diary> ownedDiary;
 
     @JsonIgnore
+    @Nullable
     @ManyToMany
     @JoinTable(
             name = "collabotorsTable",

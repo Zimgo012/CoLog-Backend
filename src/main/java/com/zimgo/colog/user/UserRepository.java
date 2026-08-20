@@ -9,6 +9,7 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    User findByUsername(String username);
     User findByEmail(String email);
     List <User> findAll();
 
@@ -27,5 +28,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "WHERE u.firstName = ?1"
     )
     Boolean existByFirstName(String name);
+
+    @Query("" +
+            "SELECT CASE WHEN COUNT(u) > 0 THEN " +
+            "TRUE ELSE FALSE END " +
+            "FROM User u " +
+            "WHERE u.username = ?1"
+    )
+    Boolean existByUsername(String name);
 
 }
