@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @ToString
@@ -29,28 +30,26 @@ public class Diary {
     private String title;
 
     @Column
-    private String content;
-
-    @Column
     private boolean isPublic;
 
     @Column
     private LocalDate createdAt = LocalDate.now();
 
     @Column
-    private LocalDate modifiedAt;
+    private LocalDate lastOpenedAt;
 
     @ManyToOne
     @JoinColumn(name = "ownerId")
     @JsonIgnore
     private User owner;
 
-    @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL)
-    public List<Document> documents;
 
     @ManyToMany(mappedBy = "collaboratedDiary")
     @JsonIgnore
-    private List<User> collaborators;
+    private List<User> collaborators = new ArrayList<>();
+
+    @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL)
+    public List<Document> documents = new ArrayList<>();
 
 
 }

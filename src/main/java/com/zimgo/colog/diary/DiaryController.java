@@ -1,11 +1,14 @@
 package com.zimgo.colog.diary;
 
 
+import com.zimgo.colog.diary.dto.DiaryRequest;
 import com.zimgo.colog.messages.MessageRepository;
 import com.zimgo.colog.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/diary")
@@ -31,23 +34,29 @@ public class DiaryController {
 
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getDiary(@PathVariable Long id) {
-        return ResponseEntity.ok(diaryService.getDiary(id));
+        return ResponseEntity.ok(diaryService.getAccessibleDiary(id));
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllDiary() {
-        return ResponseEntity.ok(diaryService.getAllDiary());
+    @GetMapping("/collaborated")
+    public ResponseEntity<?> getAllCollaboratedDiaries()
+    {
+        return ResponseEntity.ok(diaryService.getAllCollaboratedDiaries());
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> addDiary(@RequestBody Diary diary) {
-        return ResponseEntity.ok(diaryService.addDiary(diary));
+    public ResponseEntity<?> addDiary(@RequestBody DiaryRequest req) {
+        return ResponseEntity.ok(diaryService.addDiary(req));
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteDiary(@PathVariable Long id) {
         diaryService.deleteDiary(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<Diary>> getMyDiaries(){
+        return ResponseEntity.ok(diaryService.getMyDiaries());
     }
 
 }
