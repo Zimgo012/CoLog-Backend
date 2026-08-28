@@ -72,11 +72,10 @@ public class MainRunner {
             Diary diary1 = new Diary(
                     null,
                     "diary1",
-                    "",
                     true,
                     LocalDate.now(),
                     LocalDate.now(),
-                    beth,
+                    john,
                     new ArrayList<>(),
                     new ArrayList<>()
             );
@@ -84,7 +83,6 @@ public class MainRunner {
             Diary diary2 = new Diary(
                     null,
                     "diary2",
-                    "",
                     false,
                     LocalDate.now(),
                     LocalDate.now(),
@@ -131,8 +129,8 @@ public class MainRunner {
         public void run(String... args) throws Exception {
             System.out.println("DIARY - Seeding Data");
             diaryRepository.saveAll(List.of(
-                    new Diary(null, "diary3", "" ,  true, LocalDate.now(), LocalDate.now(),null,new ArrayList<>(),new ArrayList<>()),
-                    new Diary(null, "diary4", "" ,  true, LocalDate.now(), LocalDate.now(), null,new ArrayList<>(),new ArrayList<>())
+                    new Diary(null, "diary3",  true, LocalDate.now(), LocalDate.now(),null,new ArrayList<>(),new ArrayList<>()),
+                    new Diary(null, "diary4",  true, LocalDate.now(), LocalDate.now(), null,new ArrayList<>(),new ArrayList<>())
 
             ));
 //            System.out.println("DIARY - Seeding Data Finished");

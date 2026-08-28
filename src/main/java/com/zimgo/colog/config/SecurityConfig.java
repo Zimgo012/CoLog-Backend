@@ -45,6 +45,8 @@ public class SecurityConfig {
                             .hasRole("USER")
                         .requestMatchers("/auth/**")
                             .permitAll()
+                        .requestMatchers("/ws/**")
+                            .permitAll()
                         .anyRequest()
                             .authenticated()
                 );
