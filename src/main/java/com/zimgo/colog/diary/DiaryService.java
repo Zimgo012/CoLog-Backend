@@ -9,6 +9,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -46,7 +47,7 @@ public class DiaryService {
     }
 
     /**
-     * Retrieves a diary that the current user has access to.
+     * Retrieves a diary that the current user has access to. Used in HTTP Request
      *
      * This method checks if the diary exists and whether the current user is authorized
      * to access it either as the owner or as a collaborator. If the user is not authorized
@@ -74,6 +75,45 @@ public class DiaryService {
         return diary;
     }
 
+    /**
+     * Retrieves a diary by its ID if the user has access to it. Used in WebSocket
+     *
+     * @param diaryId the ID of the diary to retrieve
+     * @param userId the ID of the user attempting to access the diary
+     * @return the requested diary if the user is authorized
+     * @throws RuntimeException if the diary does not exist
+     * @throws AccessDeniedException if the user is not authorized to access the diary
+     */
+    @Transactional(readOnly = true)
+    public Diary getAccessibleDiary(Long diaryId, Long userId) {
+
+
+        Diary diary = diaryRepository.findById(diaryId)
+                .orElseThrow(() -> {
+
+                    return new RuntimeException(
+                            "Diary does not exist"
+                    );
+                });
+
+
+
+        boolean access =
+                canAccessDiary(
+                        diary,
+                        userId
+                );
+
+
+        if (!access) {
+
+            throw new AccessDeniedException(
+                    "User not authorized"
+            );
+        }
+
+        return diary;
+    }
 
     /**
      * Retrieves a list of diaries owned by the currently authenticated user.
