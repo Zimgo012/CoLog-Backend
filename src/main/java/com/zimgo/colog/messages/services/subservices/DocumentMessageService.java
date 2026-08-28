@@ -42,7 +42,8 @@ public class DocumentMessageService {
 
         // later, sender information and other metadata will be used as metadata for edits
 
-        documentService.editDocument(diaryId,payload.getDocumentId(),payload.getContent());
+        //this class will not be used for crdt
+//        documentService.editDocument(diaryId,payload.getDocumentId(),payload.getContent());
 
 //        Document doc = documentService.getDocument(req.getDocumentId());
         String content = getContent(diaryId, payload.getDocumentId());

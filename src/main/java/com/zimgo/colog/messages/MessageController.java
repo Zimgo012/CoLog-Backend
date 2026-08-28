@@ -7,11 +7,14 @@ import com.zimgo.colog.messages.services.subservices.YjsMessageService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
+import java.util.Map;
 
 
 @Controller
@@ -32,7 +35,12 @@ public class MessageController {
 
     @MessageMapping("/diary/session/{diaryId}")
     public void userMessage(@DestinationVariable Long diaryId,
-                            @Payload MessageRequest req) throws IOException {
+                            @Payload MessageRequest req,
+                            SimpMessageHeaderAccessor accessor
+                            ) throws IOException {
+
+
+        requireBinding(diaryId, accessor);
 
         if (req.getType() == null) {
             throw new RuntimeException("Message type is null!");
@@ -70,6 +78,29 @@ public class MessageController {
             default -> System.out.println("Invalid message type");
         }
 
+    }
+
+    private void requireBinding(Long diaryId, SimpMessageHeaderAccessor accessor) throws AccessDeniedException {
+        Map<String, Object> accessorAttributes = accessor.getSessionAttributes();
+
+        if (accessorAttributes == null){
+            throw new AccessDeniedException("No websocket session");
+        }
+        System.out.println("SESSION ATTRIBUTES = " + accessorAttributes);
+
+        Long boundDiaryId = (Long) accessorAttributes.get("DIARY_ID");
+
+        if (boundDiaryId == null) {
+            throw new AccessDeniedException("No diary bounded for session");
+        }
+        System.out.println(
+                "BOUND DIARY = " +
+                        accessorAttributes.get("DIARY_ID")
+        );
+
+        if(!boundDiaryId.equals(diaryId)){
+            throw new AccessDeniedException("Bounded diary dont matched");
+        }
     }
 
 
