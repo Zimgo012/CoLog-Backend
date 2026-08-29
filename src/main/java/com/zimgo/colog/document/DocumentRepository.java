@@ -27,4 +27,6 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     List<Document> findAllDocumentsByDiaryId(
             @Param("diaryId") Long diaryId
     );
+
+
 }

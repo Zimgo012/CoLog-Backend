@@ -6,6 +6,7 @@ package com.zimgo.colog.document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zimgo.colog.diary.Diary;
+import com.zimgo.colog.revision.Revision;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -40,5 +42,8 @@ public class Document {
     )
     private byte[] yjsState;
 
+    @OneToMany
+    @JsonIgnore
+    public List<Revision> revisions = new ArrayList<>();
 
 }
