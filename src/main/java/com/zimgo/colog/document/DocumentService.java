@@ -1,5 +1,6 @@
 package com.zimgo.colog.document;
 
+import com.zimgo.colog.revision.RevisionService;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -8,10 +9,12 @@ import java.util.List;
 @Service
 public class DocumentService {
 
+    private final RevisionService revisionService;
     public DocumentRepository documentRepository;
 
-    public DocumentService(DocumentRepository documentRepository) {
+    public DocumentService(DocumentRepository documentRepository, RevisionService revisionService) {
         this.documentRepository = documentRepository;
+        this.revisionService = revisionService;
     }
 
     // Functions
@@ -47,17 +50,25 @@ public class DocumentService {
         documentRepository.save(document);
     }
 
+
+    //Initial yjs-state
     public void saveYjsState(Long documentId, byte[] state){
         Document document = documentRepository.findById(documentId).orElseThrow();
 
         document.setYjsState(state);
         saveDocument(document);
-
     }
 
     public byte[] getYjsState(Long documentId){
         Document document = documentRepository.findById(documentId).orElseThrow();
         return document.getYjsState();
+    }
+
+    public void saveVersionSnapshot(Long documentId){
+        Document doc = documentRepository.findById(documentId).orElseThrow();
+
+        byte[] state = doc.getYjsState();
+        revisionService.createRevision(documentId, state);
     }
 
 
