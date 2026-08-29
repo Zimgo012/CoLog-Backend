@@ -3,6 +3,7 @@ package com.zimgo.colog.document;
 import com.zimgo.colog.diary.Diary;
 import com.zimgo.colog.diary.DiaryService;
 import com.zimgo.colog.document.dto.DocumentRequest;
+import com.zimgo.colog.revision.RevisionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,14 +23,16 @@ class DocumentServiceCreateTest {
 
     @Mock
     private DiaryService diaryService;
-
+    @Mock
+    private RevisionService revisionService;
     private DocumentService documentService;
 
     @BeforeEach
     void setUp() {
         documentService = new DocumentService(
                 documentRepository,
-                diaryService
+                diaryService,
+                revisionService
         );
     }
 
