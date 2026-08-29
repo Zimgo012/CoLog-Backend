@@ -1,21 +1,27 @@
 package com.zimgo.colog.document;
 
 import com.zimgo.colog.document.dto.DocumentRequest;
+import com.zimgo.colog.revision.Revision;
+import com.zimgo.colog.revision.RevisionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/document")
 public class DocumentController {
 
     public DocumentService documentService;
+    public RevisionService revisionService;
 
     public DocumentController(
-            DocumentService documentService
+            DocumentService documentService,
+            RevisionService revisionService
     ) {
         this.documentService = documentService;
+        this.revisionService = revisionService;
     }
 
     //CREATE a document
@@ -79,5 +85,27 @@ public class DocumentController {
         documentService.saveYjsState(diaryId, documentId, update);
 
         return ResponseEntity.ok().build();
+    }
+
+    //this would be an SSE on the future
+    @GetMapping("/{documentId}/revisions")
+    public ResponseEntity<List<Revision>>  getRevisions(
+            @PathVariable Long documentId){
+        return ResponseEntity.ok(revisionService.getDocumentRevisions(documentId));
+    }
+
+    @PostMapping("/{documentId}/revision/save")
+    public ResponseEntity<?> saveStateSnapshot(@PathVariable Long documentId){
+
+        documentService.saveVersionSnapshot(documentId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{documentId}/revisions/{revisionId}")
+    public ResponseEntity<Revision> viewRevision(
+            @PathVariable Long documentId,
+            @PathVariable Long revisionId) {
+
+        return ResponseEntity.ok(revisionService.getRevision(documentId, revisionId));
     }
 }

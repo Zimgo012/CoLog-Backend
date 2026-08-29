@@ -4,6 +4,8 @@ import com.zimgo.colog.diary.Diary;
 import com.zimgo.colog.diary.DiaryService;
 import com.zimgo.colog.document.dto.DocumentRequest;
 import com.zimgo.colog.document.dto.DocumentResponse;
+import com.zimgo.colog.revision.Revision;
+import com.zimgo.colog.revision.RevisionService;
 import org.springframework.stereotype.Service;
 
 import javax.print.Doc;
@@ -14,11 +16,13 @@ import java.util.List;
 public class DocumentService {
 
     private final DiaryService diaryService;
+    private final RevisionService revisionService;
     public DocumentRepository documentRepository;
 
-    public DocumentService(DocumentRepository documentRepository, DiaryService diaryService) {
+    public DocumentService(DocumentRepository documentRepository, DiaryService diaryService, RevisionService revisionService) {
         this.documentRepository = documentRepository;
         this.diaryService = diaryService;
+        this.revisionService = revisionService;
     }
 
     // Functions
@@ -102,6 +106,11 @@ public class DocumentService {
 
         return document.getYjsState();
     }
+    public void saveVersionSnapshot(Long documentId){
+              Document doc = documentRepository.findById(documentId).orElseThrow();
 
+              byte[] state = doc.getYjsState();
+              revisionService.createRevision(documentId, state);
+    }
 
 }
