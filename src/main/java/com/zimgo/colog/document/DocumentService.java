@@ -1,77 +1,107 @@
 package com.zimgo.colog.document;
 
-import com.zimgo.colog.revision.RevisionService;
+import com.zimgo.colog.diary.Diary;
+import com.zimgo.colog.diary.DiaryService;
+import com.zimgo.colog.document.dto.DocumentRequest;
+import com.zimgo.colog.document.dto.DocumentResponse;
 import org.springframework.stereotype.Service;
 
+import javax.print.Doc;
 import java.io.IOException;
 import java.util.List;
 
 @Service
 public class DocumentService {
 
-    private final RevisionService revisionService;
+    private final DiaryService diaryService;
     public DocumentRepository documentRepository;
 
-    public DocumentService(DocumentRepository documentRepository, RevisionService revisionService) {
+    public DocumentService(DocumentRepository documentRepository, DiaryService diaryService) {
         this.documentRepository = documentRepository;
-        this.revisionService = revisionService;
+        this.diaryService = diaryService;
     }
 
     // Functions
-    public void editDocument(Long diaryId, Long documentId, String content) throws IOException {
-        Document document = documentRepository.findDocumentByDiaryIdAndDocumentId(diaryId, documentId).orElseThrow();
-        documentRepository.save(document);
-    }
 
-    public void deleteDocument(Document document) {
-        documentRepository.delete(document);
-    }
-
+    //IMPORTANT! For mock data only
     public Document createDocument(Document document) throws IOException {
         Document savedDoc = documentRepository.save(document);
 
         return savedDoc;
     }
 
+    //CREATE document
+    public Document createDocument(Long diaryId, DocumentRequest req){
+        Diary diary = diaryService.getAccessibleDiary(diaryId);
+        Document doc = new Document();
+        doc.setDiary(diary);
+        doc.setDate(req.getDate());
 
-    public Document getDocument(Long DocumentId) {
-        return documentRepository.findById(DocumentId).orElseThrow();
+        return documentRepository.save(doc);
     }
 
-    public List<Document>  getAllDocuments(){
-        return documentRepository.findAll();
-    }
 
-    public List<Document> getDiaryDocuments(Long diaryId) {
+    //GET all document
+    public List<Document>  getAllDocuments(Long diaryId){
+        diaryService.getAccessibleDiary(diaryId);
+
         return documentRepository.findAllDocumentsByDiaryId(diaryId);
     }
 
-    public void saveDocument(Document document) {
+    //GET document by diary id and document id
+    public Document getDocument(Long diaryId, Long documentId) {
+        diaryService.getAccessibleDiary(diaryId);
+
+        return documentRepository.findDocumentByDiaryIdAndDocumentId(diaryId, documentId)
+                .orElseThrow(
+                        () -> new RuntimeException("Document does not exist")
+                );
+    }
+
+    public DocumentResponse editDocument(Long diaryId, Long documentId, DocumentRequest req) throws IOException {
+        diaryService.getAccessibleDiary(diaryId);
+
+        Document document = documentRepository.findDocumentByDiaryIdAndDocumentId(diaryId, documentId)
+                .orElseThrow(() -> new RuntimeException("Document does not exist"));
+        document.setDate(req.getDate());
+
         documentRepository.save(document);
+
+        return new DocumentResponse(document.getDate());
     }
 
 
-    //Initial yjs-state
-    public void saveYjsState(Long documentId, byte[] state){
-        Document document = documentRepository.findById(documentId).orElseThrow();
+    //DELETE DOCUMENT
+    public void deleteDocument(Long diaryId, Long documentId) {
+        diaryService.getAccessibleDiary(diaryId);
+
+        Document document = documentRepository.findDocumentByDiaryIdAndDocumentId(diaryId,documentId)
+                .orElseThrow(() -> new RuntimeException("Document does not exist"));
+
+        documentRepository.delete(document);
+    }
+
+    //SAVE yjs
+    public void saveYjsState(Long diaryId, Long documentId, byte[] state){
+        diaryService.getAccessibleDiary(diaryId);
+
+        Document document = documentRepository.findDocumentByDiaryIdAndDocumentId(diaryId,documentId)
+                .orElseThrow(() -> new RuntimeException("Document does not exist"));
 
         document.setYjsState(state);
-        saveDocument(document);
-    }
 
-    public byte[] getYjsState(Long documentId){
-        Document document = documentRepository.findById(documentId).orElseThrow();
+        documentRepository.save(document);
+
+    }
+    //RETRIEVE yjs
+    public byte[] getYjsState(Long diaryId, Long documentId){
+        diaryService.getAccessibleDiary(diaryId);
+
+        Document document = documentRepository.findDocumentByDiaryIdAndDocumentId(diaryId,documentId)
+                .orElseThrow(() -> new RuntimeException("Document does not exist"));
+
         return document.getYjsState();
     }
-
-    public void saveVersionSnapshot(Long documentId){
-        Document doc = documentRepository.findById(documentId).orElseThrow();
-
-        byte[] state = doc.getYjsState();
-        revisionService.createRevision(documentId, state);
-    }
-
-
 
 
 }

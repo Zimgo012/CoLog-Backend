@@ -1,82 +1,83 @@
 package com.zimgo.colog.document;
 
-import com.zimgo.colog.revision.Revision;
-import com.zimgo.colog.revision.RevisionService;
+import com.zimgo.colog.document.dto.DocumentRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/document")
 public class DocumentController {
 
-    private final RevisionService revisionService;
     public DocumentService documentService;
 
     public DocumentController(
-            DocumentService documentService,
-            RevisionService revisionService) {
+            DocumentService documentService
+    ) {
         this.documentService = documentService;
-        this.revisionService = revisionService;
     }
 
-    @GetMapping("/{diaryId}/all")
-    public ResponseEntity<?> getDiaryDocuments(
-            @PathVariable Long diaryId
-    ) {
+    //CREATE a document
+    @PostMapping("/{diaryId}/")
+    public ResponseEntity<?> createDocument(@PathVariable Long diaryId,
+                                            @RequestBody DocumentRequest req){
+        return ResponseEntity.ok(documentService.createDocument(diaryId,req));
+    }
 
+    //GET all document in that diary
+    @GetMapping("/{diaryId}/all")
+    public ResponseEntity<?> getDiaryDocuments(@PathVariable Long diaryId) {
         return ResponseEntity.ok(
-                documentService.getDiaryDocuments(diaryId)
+                documentService.getAllDocuments(diaryId)
         );
     }
 
-    @GetMapping("/{documentId}")
-    public ResponseEntity<?> getDocument(@PathVariable Long documentId) {
-        return ResponseEntity.ok(documentService.getDocument(documentId));
+    //GET a document
+    @GetMapping("/{diaryId}/{documentId}")
+    public ResponseEntity<?> getDocument(@PathVariable Long diaryId,
+                                         @PathVariable Long documentId) {
+        return ResponseEntity.ok(documentService.getDocument(diaryId, documentId));
     }
 
-    /**
-     * Used to update yjs state from server to client
-     * @return
-     */
-    @GetMapping( "/{documentId}/yjs")
-    public ResponseEntity<?> getState(@PathVariable Long documentId){
-        return ResponseEntity.ok(documentService.getYjsState(documentId));
+    //UPDATE a document
+    @PatchMapping("/{diaryId}/{documentId}")
+    public ResponseEntity<?> editDocument(@PathVariable Long diaryId,
+                                          @PathVariable Long documentId,
+                                          @RequestBody DocumentRequest req) throws IOException {
+        return ResponseEntity.ok(documentService.editDocument(diaryId,documentId, req));
     }
 
-    /**
-     * Used to update yjs state from client to server
-     * @return
-     */
-    @PostMapping(value = "/{documentId}/yjs",
-            consumes = "application/octet-stream")
-    public ResponseEntity<?> saveState(@PathVariable Long documentId,
-                                       @RequestBody byte[] update){
-      documentService.saveYjsState(documentId, update);
+    //DELETE a document
+    @DeleteMapping("/{diaryId}/{documentId}")
+    public ResponseEntity deleteDocument(@PathVariable Long diaryId,
+                                         @PathVariable Long documentId){
 
-      return ResponseEntity.ok().build();
-    }
-
-    //this would be an SSE on the future
-    @GetMapping("/{documentId}/revisions")
-    public ResponseEntity<List<Revision>>  getRevisions(
-                                                        @PathVariable Long documentId){
-        return ResponseEntity.ok(revisionService.getDocumentRevisions(documentId));
-    }
-
-    @PostMapping("/{documentId}/revision/save")
-    public ResponseEntity<?> saveStateSnapshot(@PathVariable Long documentId){
-
-        documentService.saveVersionSnapshot(documentId);
+        documentService.deleteDocument(diaryId,documentId);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{documentId}/revisions/{revisionId}")
-    public ResponseEntity<Revision> viewRevision(
-            @PathVariable Long documentId,
-            @PathVariable Long revisionId) {
+    /** RETRIEVE yjs state
+     * Used to update yjs state from server to client
+     * @return
+     */
+    @GetMapping( "/{diaryId}/{documentId}/yjs")
+    public ResponseEntity<?> getState(@PathVariable Long diaryId,
+                                      @PathVariable Long documentId){
+        return ResponseEntity.ok(documentService.getYjsState(diaryId, documentId));
+    }
 
-        return ResponseEntity.ok(revisionService.getRevision(documentId, revisionId));
+    /** SAVE yjs state
+     * Used to update yjs state from client to server
+     * @return
+     */
+    @PostMapping(value = "/{diaryId}/{documentId}/yjs",
+            consumes = "application/octet-stream")
+    public ResponseEntity<?> saveState(@PathVariable Long diaryId,
+                                       @PathVariable Long documentId,
+                                       @RequestBody byte[] update){
+        documentService.saveYjsState(diaryId, documentId, update);
+
+        return ResponseEntity.ok().build();
     }
 }
