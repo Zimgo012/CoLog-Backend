@@ -43,7 +43,6 @@ public class Document {
     private byte[] yjsState;
 
     @OneToMany
-    @JsonIgnore
     public List<Revision> revisions = new ArrayList<>();
 
 }

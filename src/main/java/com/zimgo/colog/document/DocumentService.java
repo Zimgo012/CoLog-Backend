@@ -30,6 +30,9 @@ public class DocumentService {
     //IMPORTANT! For mock data only
     public Document createDocument(Document document) throws IOException {
         Document savedDoc = documentRepository.save(document);
+        byte[] state = new byte[]{1,3,4,5,6};
+        revisionService.createRevision(savedDoc.getDocumentId(), state);
+
 
         return savedDoc;
     }
