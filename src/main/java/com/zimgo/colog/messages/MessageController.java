@@ -1,5 +1,6 @@
 package com.zimgo.colog.messages;
 
+import com.zimgo.colog.auth.security.CustomUserDetails;
 import com.zimgo.colog.messages.dto.payloads.*;
 import com.zimgo.colog.messages.dto.MessageRequest;
 import com.zimgo.colog.messages.services.MessageService;
@@ -9,11 +10,13 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.security.Principal;
 import java.util.Map;
 
 
@@ -36,11 +39,24 @@ public class MessageController {
     @MessageMapping("/diary/session/{diaryId}")
     public void userMessage(@DestinationVariable Long diaryId,
                             @Payload MessageRequest req,
-                            SimpMessageHeaderAccessor accessor
+                            SimpMessageHeaderAccessor accessor,
+                            Principal principal
                             ) throws IOException {
 
 
         requireBinding(diaryId, accessor);
+
+        Authentication authentication = (Authentication) principal;
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("User is not authenticated");
+        }
+
+        CustomUserDetails userDetails =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        Long userId = userDetails.getId();
+
 
         if (req.getType() == null) {
             throw new RuntimeException("Message type is null!");
@@ -68,7 +84,7 @@ public class MessageController {
 
             case CHAT -> {
                 ChatPayload payload = objectMapper.convertValue(req.getPayload(), ChatPayload.class);
-                messageService.processChatMessage(diaryId, payload);
+                messageService.processChatMessage(diaryId, payload, userId);
             }
             case LEAVE -> messageService.processLeaveMessage(diaryId);
             case JOIN -> messageService.processJoinMessage(diaryId);

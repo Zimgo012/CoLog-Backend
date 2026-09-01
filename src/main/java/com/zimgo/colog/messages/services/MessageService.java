@@ -6,6 +6,7 @@ import com.zimgo.colog.messages.services.subservices.*;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.security.Principal;
 
 @Service
 public class MessageService {
@@ -32,8 +33,8 @@ public class MessageService {
 
     }
 
-    public void processChatMessage(Long diaryId, ChatPayload payload){
-        chatMessageService.processChatMessage(diaryId, payload);
+    public void processChatMessage(Long diaryId, ChatPayload payload, Long userId){
+        chatMessageService.processChatMessage(diaryId, payload, userId);
     }
 
     public void processDocumentMessage(Long diaryId, DocumentPayload payload) throws IOException {

@@ -11,6 +11,7 @@ import com.zimgo.colog.user.UserService;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 
 @Service
@@ -58,10 +59,10 @@ public class ChatMessageService {
 
         return res;
     }
-    public void processChatMessage(Long diaryId, ChatPayload payload){
+    public void processChatMessage(Long diaryId, ChatPayload payload, Long userId){
 
-        User sender = userService.getUserById(payload.getSenderId());
-        Diary diary = diaryService.getDiary(diaryId);
+        User sender = userService.getUserById(userId);
+        Diary diary = diaryService.getAccessibleDiary(diaryId, userId);
 
         if (diary == null){
             throw new RuntimeException("Diary does not exist!");

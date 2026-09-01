@@ -6,6 +6,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -46,7 +47,9 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
         // 1. get header
         StompHeaderAccessor accessor =
-                StompHeaderAccessor.wrap(message);
+                MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+
+        //                StompHeaderAccessor.wrap(message);
 
         // SAMPLE MESAGE: Command: CONNECT
         //Headers: {
