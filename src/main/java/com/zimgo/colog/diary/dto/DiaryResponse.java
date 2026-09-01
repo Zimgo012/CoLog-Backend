@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DiaryResponse {
+    Long id;
     String title;
     boolean isPublic;
     LocalDate dateCreated;

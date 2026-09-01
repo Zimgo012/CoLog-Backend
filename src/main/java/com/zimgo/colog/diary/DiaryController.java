@@ -32,9 +32,9 @@ public class DiaryController {
 
     }
 
-    @GetMapping("/get/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> getDiary(@PathVariable Long id) {
-        return ResponseEntity.ok(diaryService.getAccessibleDiary(id));
+        return ResponseEntity.ok(diaryService.getDiary(id));
     }
 
     @GetMapping("/collaborated")
@@ -48,7 +48,7 @@ public class DiaryController {
         return ResponseEntity.ok(diaryService.addDiary(req));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteDiary(@PathVariable Long id) {
         diaryService.deleteDiary(id);
         return ResponseEntity.ok().build();

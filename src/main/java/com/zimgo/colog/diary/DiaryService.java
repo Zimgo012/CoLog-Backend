@@ -37,13 +37,16 @@ public class DiaryService {
      * @return The {@link Diary} object corresponding to the provided diaryId.
      * @throws RuntimeException If the diary with the given identifier does not exist.
      */
-    public Diary getDiary(Long diaryId) {
-        if (!diaryRepository.existsById(diaryId)) {
-            throw new RuntimeException("Diary does not exist!");
+    public DiaryResponse getDiary(Long diaryId) {
+        Diary diary = getAccessibleDiary(diaryId);
 
+        DiaryResponse response = new DiaryResponse();
+        response.setId(diary.getDiaryId());
+        response.setDateCreated(diary.getCreatedAt());
+        response.setTitle(diary.getTitle());
+        response.setPublic(diary.isPublic());
 
-        }
-        return diaryRepository.findById(diaryId).get();
+        return response;
     }
 
     /**
@@ -170,7 +173,7 @@ public class DiaryService {
 
         diaryRepository.save(diary);
 
-        return new DiaryResponse(diary.getTitle(),diary.isPublic(),diary.getCreatedAt());
+        return new DiaryResponse(diary.getDiaryId(),diary.getTitle(),diary.isPublic(),diary.getCreatedAt());
     }
 
     /**
