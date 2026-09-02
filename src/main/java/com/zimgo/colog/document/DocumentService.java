@@ -2,6 +2,8 @@ package com.zimgo.colog.document;
 
 import com.zimgo.colog.diary.Diary;
 import com.zimgo.colog.diary.DiaryService;
+import com.zimgo.colog.diary.dto.DiaryResponse;
+import com.zimgo.colog.document.dto.DocumentListResponse;
 import com.zimgo.colog.document.dto.DocumentRequest;
 import com.zimgo.colog.document.dto.DocumentResponse;
 import com.zimgo.colog.revision.Revision;
@@ -41,18 +43,26 @@ public class DocumentService {
     public Document createDocument(Long diaryId, DocumentRequest req){
         Diary diary = diaryService.getAccessibleDiary(diaryId);
         Document doc = new Document();
+        diary.getDocuments().add(doc);
         doc.setDiary(diary);
         doc.setDate(req.getDate());
+        doc.setYjsState(new byte[]{});
 
         return documentRepository.save(doc);
     }
 
 
     //GET all document
-    public List<Document>  getAllDocuments(Long diaryId){
+    public List<DocumentListResponse>  getAllDocuments(Long diaryId){
         diaryService.getAccessibleDiary(diaryId);
 
-        return documentRepository.findAllDocumentsByDiaryId(diaryId);
+        return documentRepository.findAllDocumentsByDiaryId(diaryId)
+                .stream()
+                .map(doc -> new DocumentListResponse(
+                        doc.getDocumentId(),
+                        doc.getDate()
+                ))
+                .toList();
     }
 
     //GET document by diary id and document id
