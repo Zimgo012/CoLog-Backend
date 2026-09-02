@@ -1,7 +1,8 @@
-package com.zimgo.colog.messages;
+package com.zimgo.colog.chat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zimgo.colog.diary.Diary;
+import com.zimgo.colog.messages.MessageType;
 import com.zimgo.colog.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,15 +18,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class Messages {
+public class Chat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long messageId;
 
-    private MessageType type;
 
-    //Todo:  break down this to document
     private String content;
 
     private LocalDateTime timestamp;
