@@ -2,6 +2,7 @@
 package com.zimgo.colog.diary;
 
 import com.zimgo.colog.auth.security.CustomUserDetails;
+import com.zimgo.colog.diary.dto.DiaryResponse;
 import com.zimgo.colog.user.User;
 import com.zimgo.colog.user.UserService;
 import org.junit.jupiter.api.AfterEach;
@@ -64,7 +65,6 @@ class DiaryServiceReadTest {
         diary.setDiaryId(100L);
         diary.setTitle("My Diary");
         diary.setOwner(owner);
-        diary.setPublic(false);
         diary.setCollaborators(new ArrayList<>());
 
         mockAuthenticatedUser(1L);
@@ -145,7 +145,7 @@ class DiaryServiceReadTest {
         when(diaryRepository.findAllByOwnerUserId(1L))
                 .thenReturn(diaries);
 
-        List<Diary> result =
+        List<DiaryResponse> result =
                 diaryService.getMyDiaries();
 
         assertEquals(2, result.size());
@@ -168,7 +168,7 @@ class DiaryServiceReadTest {
         when(diaryRepository.findAllByCollaboratorsUserId(2L))
                 .thenReturn(diaries);
 
-        List<Diary> result =
+        List<DiaryResponse> result =
                 diaryService.getAllCollaboratedDiaries();
 
         assertEquals(1, result.size());
