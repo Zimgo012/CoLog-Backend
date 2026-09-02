@@ -1,6 +1,7 @@
 package com.zimgo.colog.diary;
 
 
+import com.zimgo.colog.diary.dto.DiaryEditRequest;
 import com.zimgo.colog.diary.dto.DiaryRequest;
 import com.zimgo.colog.diary.dto.DiaryResponse;
 import com.zimgo.colog.messages.MessageRepository;
@@ -51,8 +52,13 @@ public class DiaryController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteDiary(@PathVariable Long id) {
-        diaryService.deleteDiary(id);
-        return ResponseEntity.ok().build();
+
+        return ResponseEntity.ok(diaryService.deleteDiary(id));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> editDiary(@PathVariable Long id, @RequestBody DiaryEditRequest req){
+        return ResponseEntity.ok(diaryService.editDiary(id,req));
     }
 
     @GetMapping("/my")

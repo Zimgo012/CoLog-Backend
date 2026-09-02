@@ -1,6 +1,8 @@
 package com.zimgo.colog.diary;
 
 import com.zimgo.colog.auth.security.CustomUserDetails;
+import com.zimgo.colog.diary.dto.DiaryDeleteResponse;
+import com.zimgo.colog.diary.dto.DiaryEditRequest;
 import com.zimgo.colog.diary.dto.DiaryRequest;
 import com.zimgo.colog.diary.dto.DiaryResponse;
 import com.zimgo.colog.user.User;
@@ -254,11 +256,34 @@ public class DiaryService {
      *
      * @param diaryId the unique identifier of the diary to be deleted
      */
-    public void deleteDiary(Long diaryId) {
+    public DiaryDeleteResponse deleteDiary(Long diaryId) {
 
         Diary diary = getOwnedDiary(diaryId);
+        Long id = diary.getDiaryId();
+        String title  = diary.getTitle();
 
         diaryRepository.delete(diary);
+
+        return new DiaryDeleteResponse(id, title);
+    }
+
+    public DiaryResponse editDiary(Long diaryId, DiaryEditRequest req){
+        Diary diaryFromDB = getAccessibleDiary(diaryId);
+
+        diaryFromDB.setTitle((req.getTitle() != null) ? req.getTitle() : diaryFromDB.getTitle());
+        diaryFromDB.setEmoji((req.getEmoji() != null) ? req.getEmoji() : diaryFromDB.getEmoji());
+        diaryFromDB.setColor((req.getColor() != null) ? req.getColor() : diaryFromDB.getColor());
+
+        diaryRepository.save(diaryFromDB);
+        DiaryResponse resp = new DiaryResponse();
+        resp.setId(diaryFromDB.getDiaryId());
+        resp.setTitle(diaryFromDB.getTitle());
+        resp.setCreatedAt(diaryFromDB.getCreatedAt());
+        resp.setOwner(diaryFromDB.getOwner().getUsername());
+        resp.setEmoji(diaryFromDB.getEmoji());
+        resp.setColor(diaryFromDB.getColor());
+
+        return resp;
     }
 
     /**
