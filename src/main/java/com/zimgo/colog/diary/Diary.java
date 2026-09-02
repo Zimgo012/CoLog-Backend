@@ -2,7 +2,6 @@ package com.zimgo.colog.diary;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.zimgo.colog.messages.Messages;
 import com.zimgo.colog.document.Document;
 import com.zimgo.colog.user.User;
 import jakarta.persistence.*;

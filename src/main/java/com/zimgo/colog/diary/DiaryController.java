@@ -4,7 +4,6 @@ package com.zimgo.colog.diary;
 import com.zimgo.colog.diary.dto.DiaryEditRequest;
 import com.zimgo.colog.diary.dto.DiaryRequest;
 import com.zimgo.colog.diary.dto.DiaryResponse;
-import com.zimgo.colog.messages.MessageRepository;
 import com.zimgo.colog.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -22,15 +21,13 @@ public class DiaryController {
     public SimpMessagingTemplate messagingTemplate;
 
     //temporary
-    public MessageRepository messageRepository;
 
 
-    public DiaryController(DiaryService diaryService, SimpMessagingTemplate messagingTemplate, UserService userService,
-                           MessageRepository messageRepository) {
+
+    public DiaryController(DiaryService diaryService, SimpMessagingTemplate messagingTemplate, UserService userService) {
         this.diaryService = diaryService;
         this.userService =  userService;
         this.messagingTemplate = messagingTemplate;
-        this.messageRepository = messageRepository;
 
     }
 
