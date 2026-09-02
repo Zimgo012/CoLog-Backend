@@ -42,9 +42,10 @@ public class DiaryService {
 
         DiaryResponse response = new DiaryResponse();
         response.setId(diary.getDiaryId());
-        response.setDateCreated(diary.getCreatedAt());
+        response.setCreatedAt(diary.getCreatedAt());
         response.setTitle(diary.getTitle());
-        response.setPublic(diary.isPublic());
+        response.setColor(diary.getColor());
+        response.setEmoji(diary.getEmoji());
 
         return response;
     }
@@ -126,10 +127,20 @@ public class DiaryService {
      *
      * @return A list of {@link Diary} objects representing the diaries owned by the current user.
      */
-    public  List<Diary> getMyDiaries(){
+    public  List<DiaryResponse> getMyDiaries(){
 
        Long userId = getIdFromJwt();
-       return diaryRepository.findAllByOwnerUserId(userId);
+       return diaryRepository.findAllByOwnerUserId(userId)
+                .stream()
+                .map(diary -> new DiaryResponse(
+                        diary.getDiaryId(),
+                        diary.getTitle(),
+                        diary.getCreatedAt(),
+                        diary.getOwner().getUsername(),
+                        diary.getColor(),
+                        diary.getEmoji()
+                ))
+                .toList();
     }
 
     /**
@@ -142,10 +153,22 @@ public class DiaryService {
      * @return A list of {@link Diary} objects representing the diaries
      *         the current user is collaborating on.
      */
-    public List<Diary> getAllCollaboratedDiaries(){
+    public List<DiaryResponse> getAllCollaboratedDiaries(){
 
         Long userId = getIdFromJwt();
-        return diaryRepository.findAllByCollaboratorsUserId(userId);
+
+
+        return diaryRepository.findAllByCollaboratorsUserId(userId)
+                .stream()
+                .map(diary -> new DiaryResponse(
+                        diary.getDiaryId(),
+                        diary.getTitle(),
+                        diary.getCreatedAt(),
+                        diary.getOwner().getUsername(),
+                        diary.getColor(),
+                        diary.getEmoji()
+                ))
+                .toList();
     }
 
 
@@ -169,11 +192,17 @@ public class DiaryService {
         diary.setCreatedAt(LocalDate.now());
         diary.setLastOpenedAt(LocalDate.now());
         diary.setOwner(user);
-        diary.setPublic(false);
 
         diaryRepository.save(diary);
 
-        return new DiaryResponse(diary.getDiaryId(),diary.getTitle(),diary.isPublic(),diary.getCreatedAt());
+        DiaryResponse response = new DiaryResponse();
+        response.setId(diary.getDiaryId());
+        response.setCreatedAt(diary.getCreatedAt());
+        response.setTitle(diary.getTitle());
+        response.setColor(diary.getColor());
+        response.setEmoji(diary.getEmoji());
+
+        return response;
     }
 
     /**

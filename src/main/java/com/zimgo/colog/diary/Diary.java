@@ -30,13 +30,16 @@ public class Diary {
     private String title;
 
     @Column
-    private boolean isPublic;
-
-    @Column
     private LocalDate createdAt = LocalDate.now();
 
     @Column
     private LocalDate lastOpenedAt;
+
+    @Column
+    private String color;
+
+    @Column
+    private String emoji;
 
     @ManyToOne
     @JoinColumn(name = "ownerId")

@@ -15,7 +15,9 @@ import java.time.LocalDate;
 public class DiaryResponse {
     Long id;
     String title;
-    boolean isPublic;
-    LocalDate dateCreated;
+    LocalDate createdAt;
+    String owner;
+    String emoji;
+    String color;
 
 }

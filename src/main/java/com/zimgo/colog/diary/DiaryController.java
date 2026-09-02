@@ -2,6 +2,7 @@ package com.zimgo.colog.diary;
 
 
 import com.zimgo.colog.diary.dto.DiaryRequest;
+import com.zimgo.colog.diary.dto.DiaryResponse;
 import com.zimgo.colog.messages.MessageRepository;
 import com.zimgo.colog.user.UserService;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +56,7 @@ public class DiaryController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<Diary>> getMyDiaries(){
+    public ResponseEntity<List<DiaryResponse>> getMyDiaries(){
         return ResponseEntity.ok(diaryService.getMyDiaries());
     }
 
