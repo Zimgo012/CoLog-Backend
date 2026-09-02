@@ -2,6 +2,7 @@ package com.zimgo.colog.document;
 
 import com.zimgo.colog.diary.Diary;
 import com.zimgo.colog.diary.DiaryService;
+import com.zimgo.colog.document.dto.DocumentListResponse;
 import com.zimgo.colog.revision.RevisionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,7 @@ class DocumentServiceReadTest {
                 .findAllDocumentsByDiaryId(diaryId))
                 .thenReturn(documents);
 
-        List<Document> result =
+        List<DocumentListResponse> result =
                 documentService.getAllDocuments(diaryId);
 
         assertEquals(2, result.size());
