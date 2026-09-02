@@ -4,6 +4,7 @@ import com.zimgo.colog.auth.dto.LoginRequest;
 import com.zimgo.colog.auth.dto.LoginResponse;
 import com.zimgo.colog.auth.dto.RegisterRequest;
 import com.zimgo.colog.auth.dto.RegisterResponse;
+import com.zimgo.colog.auth.security.CustomUserDetails;
 import com.zimgo.colog.auth.security.JWTService;
 import com.zimgo.colog.user.User;
 import com.zimgo.colog.user.UserRole;
@@ -39,11 +40,17 @@ public class AuthService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String token = jwtService.generateToken(userDetails);
-
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         //Generate JWT Token
-        return new LoginResponse(token);
+        String token = jwtService.generateToken(userDetails);
+        Long id = userDetails.getId();
+        String email = userDetails.getEmail();
+        String username = userDetails.getUsername();
+        String firstName = userDetails.getFirstName();
+        String lastName = userDetails.getLastName();
+
+
+        return new LoginResponse(id,token,email,username,firstName,lastName);
 
     }
 
