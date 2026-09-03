@@ -14,7 +14,6 @@ import java.time.LocalDate;
 public class DiaryRequest {
 
     String title;
-    boolean isPublic;
     LocalDate createdAt;
     LocalDate lastOpenedAt;
 }

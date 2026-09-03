@@ -25,7 +25,7 @@ public class DocumentController {
     }
 
     //CREATE a document
-    @PostMapping("/{diaryId}/")
+    @PostMapping("/{diaryId}/create")
     public ResponseEntity<?> createDocument(@PathVariable Long diaryId,
                                             @RequestBody DocumentRequest req){
         return ResponseEntity.ok(documentService.createDocument(diaryId,req));

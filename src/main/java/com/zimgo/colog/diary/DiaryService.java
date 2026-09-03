@@ -139,8 +139,8 @@ public class DiaryService {
                         diary.getTitle(),
                         diary.getCreatedAt(),
                         diary.getOwner().getUsername(),
-                        diary.getColor(),
-                        diary.getEmoji()
+                        diary.getEmoji(),
+                        diary.getColor()
                 ))
                 .toList();
     }
