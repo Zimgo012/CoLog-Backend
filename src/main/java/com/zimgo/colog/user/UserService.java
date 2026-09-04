@@ -169,5 +169,7 @@ public class UserService {
         return new UserResponse(userFromDB.getFirstName(), userFromDB.getLastName(), userFromDB.getEmail());
     }
 
-
+    public Boolean findIfUsernameExist(String username){
+        return userRepository.existByUsername(username);
+    }
 }

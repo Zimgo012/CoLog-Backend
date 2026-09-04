@@ -1,6 +1,7 @@
 package com.zimgo.colog.user;
 
 import com.zimgo.colog.user.dto.UserRequest;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -41,5 +42,10 @@ public class UserController {
     public ResponseEntity<?> deleteUser(@PathVariable Long id ){
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/check/{username}")
+    public ResponseEntity<?> checkUsername(@PathVariable String username){
+        return ResponseEntity.ok(userService.findIfUsernameExist(username));
     }
 }

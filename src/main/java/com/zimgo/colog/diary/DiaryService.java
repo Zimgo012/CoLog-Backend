@@ -1,10 +1,7 @@
 package com.zimgo.colog.diary;
 
 import com.zimgo.colog.auth.security.CustomUserDetails;
-import com.zimgo.colog.diary.dto.DiaryDeleteResponse;
-import com.zimgo.colog.diary.dto.DiaryEditRequest;
-import com.zimgo.colog.diary.dto.DiaryRequest;
-import com.zimgo.colog.diary.dto.DiaryResponse;
+import com.zimgo.colog.diary.dto.*;
 import com.zimgo.colog.user.User;
 import com.zimgo.colog.user.UserService;
 import org.springframework.security.access.AccessDeniedException;
@@ -155,6 +152,23 @@ public class DiaryService {
      * @return A list of {@link Diary} objects representing the diaries
      *         the current user is collaborating on.
      */
+    public List<DiaryCollaboratorsListResponse> getAllCollaborators(Long diaryId){
+
+        return diaryRepository.findCollaboratorsExceptOwner(diaryId)
+                .stream()
+                .map(user -> new DiaryCollaboratorsListResponse(
+                        user.getUserId(),
+                        user.getUsername(),
+                        user.getFirstName() + " " + user.getLastName(),
+                        user.getEmail()
+                )).toList();
+    }
+
+    /**
+     * Retrieves a list of diaries collaborated on by the currently authenticated user.
+     *
+     * @return a list of DiaryResponse objects, each representing a diary the user is a collaborator on.
+     */
     public List<DiaryResponse> getAllCollaboratedDiaries(){
 
         Long userId = getIdFromJwt();
@@ -267,6 +281,15 @@ public class DiaryService {
         return new DiaryDeleteResponse(id, title);
     }
 
+    /**
+     * Edits an existing diary by updating its title, emoji, and color based on the provided request.
+     * If a specific field in the request is null, the original value from the database is retained.
+     * The updated diary is saved to the database and a response object is returned.
+     *
+     * @param diaryId The unique identifier of the diary to be edited.
+     * @param req The request object containing updated diary attributes such as title, emoji, and color.
+     * @return A response object containing the updated diary details including ID, title, creation timestamp, owner, emoji, and color.
+     */
     public DiaryResponse editDiary(Long diaryId, DiaryEditRequest req){
         Diary diaryFromDB = getAccessibleDiary(diaryId);
 
@@ -285,6 +308,10 @@ public class DiaryService {
 
         return resp;
     }
+
+//    public DiaryInviteResponse (String email){
+//
+//    }
 
     /**
      * Determines if a user has access to a given diary.

@@ -35,11 +35,21 @@ public class DiaryController {
     public ResponseEntity<?> getDiary(@PathVariable Long id) {
         return ResponseEntity.ok(diaryService.getDiary(id));
     }
+    @GetMapping("/{id}/collaborators/")
+    public ResponseEntity<?> getCollaborators(@PathVariable Long id){
+        return ResponseEntity.ok(diaryService.getAllCollaborators(id));
+    }
+
 
     @GetMapping("/collaborated")
     public ResponseEntity<?> getAllCollaboratedDiaries()
     {
         return ResponseEntity.ok(diaryService.getAllCollaboratedDiaries());
+    }
+
+    @PostMapping("/invite/{userId}")
+    public ResponseEntity<?> inviteUser(@PathVariable Long userId){
+        return ResponseEntity.ok();
     }
 
     @PostMapping("/create")
