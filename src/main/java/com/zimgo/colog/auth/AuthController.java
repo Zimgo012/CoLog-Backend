@@ -1,8 +1,11 @@
 package com.zimgo.colog.auth;
 
+import com.zimgo.colog.auth.dto.EmailVerifyRequest;
 import com.zimgo.colog.auth.dto.LoginRequest;
 import com.zimgo.colog.auth.dto.RegisterRequest;
+import com.zimgo.colog.auth.pendingRegistration.PendingRegistration;
 import com.zimgo.colog.auth.security.JWTService;
+import com.zimgo.colog.email.EmailOTPService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +38,11 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req){
         return ResponseEntity.ok(authService.register(req));
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyOTP(@RequestBody EmailVerifyRequest req){
+        return ResponseEntity.ok(authService.verify(req));
     }
 
 }
