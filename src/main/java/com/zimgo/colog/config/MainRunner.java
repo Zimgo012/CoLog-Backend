@@ -63,7 +63,7 @@ public class MainRunner {
             User jaden = new User(null, "Jaden", "Vance","jvance69", "jvance@mail.com","",UserRole.USER,
                     new ArrayList<>(), new ArrayList<>());
 
-            User beth = new User(null, "Beth", "Holland", "bholland67","bholland@mail.com","",UserRole.ADMIN,
+            User beth = new User(null, "Beth", "Holland", "bholland67","bholland@mail.com", passwordEncoder.encode("hello"), UserRole.ADMIN,
                     new ArrayList<>(), new ArrayList<>());
 
             userRepository.saveAll(List.of(john, ellen, jaden, beth));
@@ -72,20 +72,23 @@ public class MainRunner {
             Diary diary1 = new Diary(
                     null,
                     "diary1",
-                    true,
                     LocalDate.now(),
                     LocalDate.now(),
+                    "",
+                    "",
                     john,
                     new ArrayList<>(),
                     new ArrayList<>()
+
             );
 
             Diary diary2 = new Diary(
                     null,
                     "diary2",
-                    false,
                     LocalDate.now(),
                     LocalDate.now(),
+                    "",
+                    "",
                     beth,
                     new ArrayList<>(),
                     new ArrayList<>()
@@ -93,14 +96,29 @@ public class MainRunner {
 
             diaryRepository.saveAll(List.of(diary1, diary2));
 
-            // link ownership AFTER persistence
-            beth.getOwnedDiary().add(diary1);
+
+// ---------------- OWNERSHIP ----------------
             beth.getOwnedDiary().add(diary2);
+            john.getOwnedDiary().add(diary1);
+
+
+            // ---------------- COLLABORATORS ----------------
+
+            // Beth collaborates on John's diary1
+            diary1.getCollaborators().add(beth);
+            beth.getCollaboratedDiary().add(diary1);
+
+            // Jaden collaborates on both diaries
+            diary1.getCollaborators().add(jaden);
+            diary2.getCollaborators().add(jaden);
 
             jaden.getCollaboratedDiary().add(diary1);
             jaden.getCollaboratedDiary().add(diary2);
 
-            userRepository.saveAll(List.of(beth, jaden));
+
+            // ---------------- SAVE ----------------
+            userRepository.saveAll(List.of(john, beth, jaden));
+            diaryRepository.saveAll(List.of(diary1, diary2));
 
             // ---------------- DOCUMENTS ----------------
             Document doc1 = new Document();
@@ -129,8 +147,8 @@ public class MainRunner {
         public void run(String... args) throws Exception {
             System.out.println("DIARY - Seeding Data");
             diaryRepository.saveAll(List.of(
-                    new Diary(null, "diary3",  true, LocalDate.now(), LocalDate.now(),null,new ArrayList<>(),new ArrayList<>()),
-                    new Diary(null, "diary4",  true, LocalDate.now(), LocalDate.now(), null,new ArrayList<>(),new ArrayList<>())
+                    new Diary(null, "diary3",   LocalDate.now(), LocalDate.now(),"","",null,new ArrayList<>(),new ArrayList<>()),
+                    new Diary(null, "diary4",  LocalDate.now(), LocalDate.now(),"","", null,new ArrayList<>(),new ArrayList<>())
 
             ));
 //            System.out.println("DIARY - Seeding Data Finished");
