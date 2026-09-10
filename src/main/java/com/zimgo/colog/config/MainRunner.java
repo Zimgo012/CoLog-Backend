@@ -54,7 +54,7 @@ public class MainRunner {
             System.out.println("USER - Seeding Data");
 
             // ---------------- USERS ----------------
-            User john = new User(null, "John", "Doe","jdoe223", "jdoe@mail.com", passwordEncoder.encode("john123"), UserRole.USER,
+            User john = new User(null, "John", "Doe","jdoe223", "jdoe@mail.com", passwordEncoder.encode("john1234"), UserRole.USER,
                     new ArrayList<>(), new ArrayList<>());
 
             User ellen = new User(null, "Ellen", "Green","egreen01", "egreen@mail.com","",UserRole.ADMIN,
@@ -63,7 +63,7 @@ public class MainRunner {
             User jaden = new User(null, "Jaden", "Vance","jvance69", "jvance@mail.com","",UserRole.USER,
                     new ArrayList<>(), new ArrayList<>());
 
-            User beth = new User(null, "Beth", "Holland", "bholland67","bholland@mail.com", passwordEncoder.encode("hello"), UserRole.ADMIN,
+            User beth = new User(null, "Beth", "Holland", "bholland67","bholland@mail.com", passwordEncoder.encode("hello123"), UserRole.ADMIN,
                     new ArrayList<>(), new ArrayList<>());
 
             userRepository.saveAll(List.of(john, ellen, jaden, beth));
