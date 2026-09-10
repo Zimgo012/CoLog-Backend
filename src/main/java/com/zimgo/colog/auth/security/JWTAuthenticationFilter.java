@@ -1,6 +1,6 @@
 package com.zimgo.colog.auth.security;
 
-import io.jsonwebtoken.JwtException;
+import com.zimgo.colog.exception.AppException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,11 +64,26 @@ import java.io.IOException;
 
                     // 2.6.2 Store in Security Context
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    writeUnauthorizedResponse(response);
+                    return;
                 }
 
-            } catch (JwtException e){response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);}
+            } catch (AppException ex) {
+                SecurityContextHolder.clearContext();
+                writeUnauthorizedResponse(response);
+                return;
+            }
 
             filterChain.doFilter(request,response);
 
+        }
+
+        private void writeUnauthorizedResponse(HttpServletResponse response) throws IOException {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"status\":401,\"code\":\"INVALID_JWT\","
+                    + "\"message\":\"Invalid or expired JWT token\"}");
         }
 }

@@ -1,13 +1,13 @@
 package com.zimgo.colog.auth.security;
 
-import com.zimgo.colog.diary.DiaryService;
+import com.zimgo.colog.exception.AppException;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -82,8 +82,8 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
      *                 "Authorization" header containing the JWT token.
      * @return An {@code Authentication} object representing the authenticated user and
      *         their granted authorities.
-     * @throws AccessDeniedException If the "Authorization" header is missing, does not
-     *                               contain a Bearer token, or if the token is invalid.
+     * @throws AppException If the "Authorization" header is missing, does not
+     *                      contain a Bearer token, or if the token is invalid.
      */
     private Authentication authenticate(StompHeaderAccessor accessor){
         // 3. Check authentication
@@ -91,7 +91,11 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
         // 3-1. make sure to check bearer
         if (authHeader == null || !authHeader.startsWith("Bearer ")){
-            throw new AccessDeniedException ("Missing authorization header");
+            throw new AppException(
+                    HttpStatus.UNAUTHORIZED,
+                    "MISSING_AUTHORIZATION_HEADER",
+                    "Authorization header with a Bearer token is required"
+            );
         }
 
         try{
@@ -107,7 +111,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
             // Check if token is valid
             if(!jwtService.isValidToken(jwt, userDetails)){
-                throw new AccessDeniedException("Invalid JWT");
+                throw invalidJwt();
             }
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -119,8 +123,8 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
             return authentication;
 
-        }catch (Exception e){
-            throw new AccessDeniedException("Invalid JWT");
+        } catch (AppException ex) {
+            throw invalidJwt();
         }
 
     }
@@ -134,8 +138,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
      *                          native headers and manage session attributes.
      * @param authentication    The {@code Authentication} object containing the user's
      *                          authentication details, including principal information.
-     * @throws AccessDeniedException If the "diaryId" header is missing, session attributes are missing,
-     *                               or the user is not authorized to access the requested diary.
+     * @throws AppException If the "diaryId" header is missing or invalid, or session attributes are missing.
      */
     private void bindDiary(
             StompHeaderAccessor accessor,
@@ -146,17 +149,31 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 accessor.getFirstNativeHeader("diaryId");
 
         if (diaryIdHeader == null) {
-            throw new AccessDeniedException(
-                    "Missing diary ID"
+            throw new AppException(
+                    HttpStatus.BAD_REQUEST,
+                    "MISSING_DIARY_ID",
+                    "diaryId header is required"
             );
         }
 
-        Long diaryId =
-                Long.parseLong(diaryIdHeader);
+        Long diaryId;
+        try {
+            diaryId = Long.parseLong(diaryIdHeader);
+        } catch (NumberFormatException ex) {
+            throw new AppException(
+                    HttpStatus.BAD_REQUEST,
+                    "INVALID_DIARY_ID",
+                    "diaryId header must be a valid number"
+            );
+        }
 
-        CustomUserDetails userDetails =
-                (CustomUserDetails)
-                        authentication.getPrincipal();
+        if (!(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
+            throw new AppException(
+                    HttpStatus.UNAUTHORIZED,
+                    "INVALID_AUTHENTICATION",
+                    "WebSocket authentication is invalid"
+            );
+        }
 
         Long userId =
                 userDetails.getId();
@@ -169,8 +186,10 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 accessor.getSessionAttributes();
 
         if (attributes == null) {
-            throw new AccessDeniedException(
-                    "Session attributes missing"
+            throw new AppException(
+                    HttpStatus.UNAUTHORIZED,
+                    "WEBSOCKET_SESSION_NOT_FOUND",
+                    "WebSocket session attributes are missing"
             );
         }
 
@@ -184,5 +203,12 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 userId
         );
     }
-}
 
+    private AppException invalidJwt() {
+        return new AppException(
+                HttpStatus.UNAUTHORIZED,
+                "INVALID_JWT",
+                "Invalid or expired JWT token"
+        );
+    }
+}

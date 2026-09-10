@@ -6,12 +6,14 @@ import com.zimgo.colog.auth.pendingRegistration.PendingRegistrationRepository;
 import com.zimgo.colog.auth.security.CustomUserDetails;
 import com.zimgo.colog.auth.security.JWTService;
 import com.zimgo.colog.email.EmailOTPService;
+import com.zimgo.colog.exception.AppException;
 import com.zimgo.colog.user.User;
 import com.zimgo.colog.user.UserRepository;
 import com.zimgo.colog.user.UserRole;
 import com.zimgo.colog.user.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.repository.Repository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -77,12 +79,20 @@ public class AuthService {
             PendingRegistration pendingRegistration = pendingRegistrationRepository.findByEmail(req.getEmail());
 
             if (pendingRegistration == null){
-                throw new RuntimeException("no email found");
+                throw new AppException(
+                        HttpStatus.NOT_FOUND,
+                        "PENDING_REGISTRATION_NOT_FOUND",
+                        "No pending registration found for this email"
+                );
             }
 
             if (!LocalDateTime.now().isBefore(pendingRegistration.getExpiresAt())) {
                 pendingRegistrationRepository.delete(pendingRegistration);
-                throw new RuntimeException("Verification code expired");
+                throw new AppException(
+                        HttpStatus.GONE,
+                        "VERIFICATION_CODE_EXPIRED",
+                        "Verification code expired"
+                );
             }
 
             //verify
@@ -90,7 +100,11 @@ public class AuthService {
                     req.getCode(),
                     pendingRegistration.getVerificationCodeHash())) {
 
-                throw new RuntimeException("Invalid verification code");
+                throw new AppException(
+                        HttpStatus.BAD_REQUEST,
+                        "INVALID_VERIFICATION_CODE",
+                        "Invalid verification code"
+                );
             }
 
 
@@ -122,7 +136,11 @@ public class AuthService {
             User user = userRepository.findByEmail(registerRequest.getEmail());
 
             if (user != null){
-                throw new RuntimeException("User already exists!");
+                throw new AppException(
+                        HttpStatus.CONFLICT,
+                        "USER_ALREADY_EXISTS",
+                        "An account with this email already exists"
+                );
             }
             PendingRegistration registration = pendingRegistrationRepository.findByEmail(registerRequest.getEmail());
 
