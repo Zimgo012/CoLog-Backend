@@ -1,8 +1,10 @@
 package com.zimgo.colog.user;
 
 import com.zimgo.colog.auth.security.CustomUserDetails;
+import com.zimgo.colog.exception.AppException;
 import com.zimgo.colog.user.dto.UserRequest;
 import com.zimgo.colog.user.dto.UserResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -56,12 +58,12 @@ public class UserService {
      */
     public User getUserById(Long id){
 
-        boolean userExist = userRepository.existsById(id);
-        if (!userExist){
-            throw new RuntimeException("User does not exist!");
-        }
-
-        return userRepository.findById(id).get();
+        return userRepository.findById(id)
+                .orElseThrow(() -> new AppException(
+                        HttpStatus.NOT_FOUND,
+                        "USER_NOT_FOUND",
+                        "User not found!"
+                ));
     }
 
     /** GET User by email
@@ -76,7 +78,10 @@ public class UserService {
 
         boolean userExist = userRepository.existsByEmail(email);
         if (!userExist){
-            throw new RuntimeException("User does not exist");
+            throw new AppException(
+                    HttpStatus.NOT_FOUND,
+                    "USER_NOT_FOUND",
+                    "User not found!");
         }
 
         return userRepository.findByEmail(email);
@@ -92,7 +97,10 @@ public class UserService {
     public User getUserByUsername(String username){
         boolean userExist = userRepository.existByUsername(username);
         if (!userExist){
-            throw new RuntimeException("User does not exist");
+            throw new AppException(
+                    HttpStatus.NOT_FOUND,
+                    "USER_NOT_FOUND",
+                    "User not found!");
         }
 
         return userRepository.findByUsername(username);
@@ -109,7 +117,10 @@ public class UserService {
         boolean userExist = userRepository.existsByEmail(user.getEmail()) && userRepository.existByFirstName(user.getFirstName());
 
         if (userExist) {
-            throw new RuntimeException("User exist!");
+            throw new AppException(
+                    HttpStatus.CONFLICT,
+                    "USER_ALREADY_EXIST",
+                    "An account with this email already exists");
         }
 
         return userRepository.save(user);
@@ -138,7 +149,10 @@ public class UserService {
 
         boolean userExist = userRepository.existsById(id);
         if(!userExist){
-            throw new RuntimeException("User does not exist!");
+            throw new AppException(
+                    HttpStatus.NOT_FOUND,
+                    "USER_NOT_FOUND",
+                    "User not found!");
         }
 
 
@@ -147,11 +161,18 @@ public class UserService {
 
         Long authenticatedUserId = userDetails.getId();
 
-        User userFromDB = userRepository.findById(id).get(); //we can shorthand this
+        User userFromDB = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(
+                        HttpStatus.NOT_FOUND,
+                        "USER_NOT_FOUND",
+                        "User not found!"
+                ));
 
         if (!authenticatedUserId.equals(id)) {
-            throw new AccessDeniedException(
-                    "Can only edit your own account"
+            throw new AppException(
+                    HttpStatus.FORBIDDEN,
+                    "USER_ACCESS_DENIED",
+                    "You do not have permission to edit this user"
             );
         }
 

@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.AccessDeniedException;
+import static com.zimgo.colog.exception.RequestValidator.requireBody;
 
 
 @RestController
@@ -32,8 +32,8 @@ public class UserController {
     }
 
     @PatchMapping("/edit/{id}")
-    public ResponseEntity<?> editUser(@RequestBody UserRequest req, @PathVariable Long id) throws AccessDeniedException {
-        return ResponseEntity.ok(userService.editUser(req, id));
+    public ResponseEntity<?> editUser(@RequestBody UserRequest req, @PathVariable Long id) {
+        return ResponseEntity.ok(userService.editUser(requireBody(req), id));
     }
 
 
