@@ -2,8 +2,14 @@ package com.zimgo.colog.diary;
 
 import com.zimgo.colog.auth.security.CustomUserDetails;
 import com.zimgo.colog.diary.dto.*;
+import com.zimgo.colog.messages.dto.payloads.CollaboratorPayload;
+import com.zimgo.colog.messages.dto.payloads.enums.CollaboratorOperationType;
+import com.zimgo.colog.messages.services.MessageService;
+import com.zimgo.colog.messages.services.subservices.NotificationMessageService;
 import com.zimgo.colog.user.User;
 import com.zimgo.colog.user.UserService;
+import org.aspectj.weaver.ast.Not;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,11 +28,15 @@ import java.util.List;
 @Service
 public class DiaryService {
     private final UserService userService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
     public DiaryRepository diaryRepository;
 
-    public DiaryService(DiaryRepository diaryRepository, UserService userService) {
+    public DiaryService(DiaryRepository diaryRepository,
+                        UserService userService,
+                        SimpMessagingTemplate simpMessagingTemplate) {
         this.diaryRepository = diaryRepository;
         this.userService = userService;
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
     /**
@@ -228,20 +238,32 @@ public class DiaryService {
      * If the specified user is already a collaborator, no changes are made.
      *
      * @param diaryId The unique identifier of the diary to which the collaborator is being added.
-     * @param userId The unique identifier of the user to be added as a collaborator.
+     * @param req Request body of the function which includes email.
      * @throws RuntimeException If the diary does not exist or if the current user does not own the diary.
      */
-    public void addCollaborator(Long diaryId, Long userId) {
+    public DiaryCollaboratorResponse addCollaborator(Long diaryId, DiaryCollaboratorRequest req) {
 
         Diary diary = getOwnedDiary(diaryId);
 
-        User user = userService.getUserById(userId);
+        User user = userService.getUserByEmail(req.getEmail());
 
         if (!diary.getCollaborators().contains(user)) {
             diary.getCollaborators().add(user);
         }
 
         diaryRepository.save(diary);
+
+        Long currentDiaryId = diary.getDiaryId();
+        String diaryTitle = diary.getTitle();
+        String diaryOwnerName = diary.getOwner().getUsername();
+        Long id = user.getUserId();
+        String name =  user.getFirstName() + user.getLastName();
+        String email = user.getEmail();
+        String username = user.getUsername();
+
+        DiaryCollaboratorResponse res = new DiaryCollaboratorResponse(currentDiaryId,diaryTitle,diaryOwnerName,id,name,email,username);
+
+        return res;
     }
 
     /**
@@ -251,18 +273,32 @@ public class DiaryService {
      * associated with the diary. If the user is not currently a collaborator, no changes are made.
      *
      * @param diaryId The unique identifier of the diary from which the collaborator is being removed.
-     * @param userId The unique identifier of the user to be removed as a collaborator.
+     * @param req Request body of the function which includes email.
      * @throws RuntimeException If the diary does not exist or if the current user does not own the diary.
      */
-    public void removeCollaborator(Long diaryId, Long userId) {
+    public DiaryCollaboratorResponse removeCollaborator(Long diaryId, DiaryCollaboratorRequest req) {
 
         Diary diary = getOwnedDiary(diaryId);
 
-        User user = userService.getUserById(userId);
+        User user = userService.getUserByEmail(req.getEmail());
+        boolean removed = diary.getCollaborators().remove(user);
 
-        diary.getCollaborators().remove(user);
+        System.out.println("Removed: " + removed);
+        System.out.println("Remaining collaborators: " + diary.getCollaborators().size());
 
         diaryRepository.save(diary);
+
+        Long currentDiaryId = diary.getDiaryId();
+        String diaryTitle = diary.getTitle();
+        String diaryOwnerName = diary.getOwner().getUsername();
+        Long id = user.getUserId();
+        String name =  user.getFirstName() + user.getLastName();
+        String email = user.getEmail();
+        String username = user.getUsername();
+
+        DiaryCollaboratorResponse res = new DiaryCollaboratorResponse(currentDiaryId,diaryTitle,diaryOwnerName,id,name,email,username);
+
+        return res;
     }
 
     /**
@@ -308,10 +344,6 @@ public class DiaryService {
 
         return resp;
     }
-
-//    public DiaryInviteResponse (String email){
-//
-//    }
 
     /**
      * Determines if a user has access to a given diary.

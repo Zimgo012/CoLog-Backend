@@ -1,7 +1,9 @@
 package com.zimgo.colog.messages.services;
 
+import com.zimgo.colog.diary.dto.DiaryCollaboratorResponse;
 import com.zimgo.colog.messages.dto.MessageRequest;
 import com.zimgo.colog.messages.dto.payloads.*;
+import com.zimgo.colog.messages.dto.payloads.enums.CollaboratorOperationType;
 import com.zimgo.colog.messages.services.subservices.*;
 import org.springframework.stereotype.Service;
 
@@ -58,6 +60,9 @@ public class MessageService {
 
     public void processYjsUpdate(Long diaryId, Long documentId, YjsPayload yjsPayload){
         yjsMessageService.processYjsMessage(diaryId, documentId, yjsPayload);
+    }
+    public void processNotification(String username, CollaboratorPayload payload){
+        notificationMessageService.processNotification(username, payload);
     }
 
 }

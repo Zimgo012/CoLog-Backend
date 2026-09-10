@@ -1,9 +1,10 @@
 package com.zimgo.colog.diary;
 
 
-import com.zimgo.colog.diary.dto.DiaryEditRequest;
-import com.zimgo.colog.diary.dto.DiaryRequest;
-import com.zimgo.colog.diary.dto.DiaryResponse;
+import com.zimgo.colog.diary.dto.*;
+import com.zimgo.colog.messages.dto.payloads.CollaboratorPayload;
+import com.zimgo.colog.messages.dto.payloads.enums.CollaboratorOperationType;
+import com.zimgo.colog.messages.services.MessageService;
 import com.zimgo.colog.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -18,16 +19,18 @@ public class DiaryController {
     public DiaryService diaryService;
 
     public UserService userService;
-    public SimpMessagingTemplate messagingTemplate;
+
+    private final MessageService messageService;
+
 
     //temporary
 
 
 
-    public DiaryController(DiaryService diaryService, SimpMessagingTemplate messagingTemplate, UserService userService) {
+    public DiaryController(DiaryService diaryService, MessageService messageService, UserService userService) {
         this.diaryService = diaryService;
         this.userService =  userService;
-        this.messagingTemplate = messagingTemplate;
+        this.messageService = messageService;
 
     }
 
@@ -47,9 +50,44 @@ public class DiaryController {
         return ResponseEntity.ok(diaryService.getAllCollaboratedDiaries());
     }
 
-    @PostMapping("/invite/{userId}")
-    public ResponseEntity<?> inviteUser(@PathVariable Long userId){
-        return ResponseEntity.ok();
+    @PostMapping("/{diaryId}/add/collaborator")
+    public ResponseEntity<?> inviteUser(@PathVariable Long diaryId, @RequestBody DiaryCollaboratorRequest req){
+
+
+        DiaryCollaboratorResponse resp = diaryService.addCollaborator(diaryId,req);
+
+        CollaboratorPayload payload = new CollaboratorPayload(
+                resp.getDiaryId(),
+                resp.getTitle(),
+                resp.getDiayOwnerName(),
+                resp.getName(),
+                resp.getEmail(),
+                resp.getUsername(),
+                CollaboratorOperationType.ADD_COLLABORATOR);
+
+
+        messageService.processNotification(resp.getUsername(),payload);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{diaryId}/remove/collaborator")
+    public ResponseEntity<?> removeUser(@PathVariable Long diaryId, @RequestBody DiaryCollaboratorRequest req){
+
+        DiaryCollaboratorResponse resp = diaryService.removeCollaborator(diaryId,req);
+
+        CollaboratorPayload payload = new CollaboratorPayload(
+                resp.getDiaryId(),
+                resp.getTitle(),
+                resp.getDiayOwnerName(),
+                resp.getName(),
+                resp.getEmail(),
+                resp.getUsername(),
+                CollaboratorOperationType.REMOVE_COLLABORATOR);
+
+        messageService.processNotification(resp.getUsername(),payload);
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/create")
