@@ -6,6 +6,7 @@ import com.zimgo.colog.messages.dto.payloads.CollaboratorPayload;
 import com.zimgo.colog.messages.dto.payloads.enums.CollaboratorOperationType;
 import com.zimgo.colog.messages.services.MessageService;
 import com.zimgo.colog.user.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -53,7 +54,7 @@ public class DiaryController {
     }
 
     @PostMapping("/{diaryId}/add/collaborator")
-    public ResponseEntity<?> inviteUser(@PathVariable Long diaryId, @RequestBody DiaryCollaboratorRequest req){
+    public ResponseEntity<?> inviteUser(@PathVariable Long diaryId, @Valid @RequestBody DiaryCollaboratorRequest req){
 
 
         DiaryCollaboratorResponse resp = diaryService.addCollaborator(diaryId, requireBody(req));
@@ -74,7 +75,7 @@ public class DiaryController {
     }
 
     @DeleteMapping("/{diaryId}/remove/collaborator")
-    public ResponseEntity<?> removeUser(@PathVariable Long diaryId, @RequestBody DiaryCollaboratorRequest req){
+    public ResponseEntity<?> removeUser(@PathVariable Long diaryId, @Valid @RequestBody DiaryCollaboratorRequest req){
 
         DiaryCollaboratorResponse resp = diaryService.removeCollaborator(diaryId, requireBody(req));
 
@@ -93,7 +94,7 @@ public class DiaryController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> addDiary(@RequestBody DiaryRequest req) {
+    public ResponseEntity<?> addDiary(@Valid @RequestBody DiaryRequest req) {
         return ResponseEntity.ok(diaryService.addDiary(requireBody(req)));
     }
 
@@ -104,7 +105,7 @@ public class DiaryController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> editDiary(@PathVariable Long id, @RequestBody DiaryEditRequest req){
+    public ResponseEntity<?> editDiary(@PathVariable Long id, @Valid @RequestBody DiaryEditRequest req){
         return ResponseEntity.ok(diaryService.editDiary(id, requireBody(req)));
     }
 
