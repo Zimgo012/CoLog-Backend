@@ -20,7 +20,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,6 +46,14 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                         )
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, ex) ->
+                                writeSecurityError(response, HttpServletResponse.SC_UNAUTHORIZED,
+                                        "AUTHENTICATION_REQUIRED", "Authentication is required"))
+                        .accessDeniedHandler((request, response, ex) ->
+                                writeSecurityError(response, HttpServletResponse.SC_FORBIDDEN,
+                                        "ACCESS_DENIED", "You do not have permission to access this resource"))
+                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
                 //Authorization Config
@@ -96,6 +106,15 @@ public class SecurityConfig {
             AuthenticationConfiguration configuration)
             throws Exception {
         return configuration.getAuthenticationManager();
+    }
+
+    private void writeSecurityError(HttpServletResponse response, int status, String code, String message)
+            throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"status\":" + status + ",\"code\":\"" + code
+                + "\",\"message\":\"" + message + "\"}");
     }
 
 }
