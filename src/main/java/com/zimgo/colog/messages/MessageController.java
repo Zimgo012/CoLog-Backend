@@ -1,10 +1,13 @@
 package com.zimgo.colog.messages;
 
 import com.zimgo.colog.auth.security.CustomUserDetails;
-import com.zimgo.colog.messages.dto.payloads.*;
+import com.zimgo.colog.exception.AppException;
 import com.zimgo.colog.messages.dto.MessageRequest;
+import com.zimgo.colog.messages.dto.payloads.ChatPayload;
+import com.zimgo.colog.messages.dto.payloads.PresencePayload;
+import com.zimgo.colog.messages.dto.payloads.YjsPayload;
 import com.zimgo.colog.messages.services.MessageService;
-import com.zimgo.colog.messages.services.subservices.YjsMessageService;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -14,8 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
-import java.nio.file.AccessDeniedException;
 import java.security.Principal;
 import java.util.Map;
 
@@ -40,34 +41,39 @@ public class MessageController {
     public void userMessage(@DestinationVariable Long diaryId,
                             @Payload MessageRequest req,
                             SimpMessageHeaderAccessor accessor,
-                            Principal principal
-                            ) throws IOException {
-
-
+                            Principal principal) {
         requireBinding(diaryId, accessor);
 
-        Authentication authentication = (Authentication) principal;
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AccessDeniedException("User is not authenticated");
+        if (!(principal instanceof Authentication authentication) || !authentication.isAuthenticated()) {
+            throw new AppException(
+                    HttpStatus.UNAUTHORIZED,
+                    "UNAUTHENTICATED_USER",
+                    "User must be authenticated to send messages"
+            );
         }
 
-        CustomUserDetails userDetails =
-                (CustomUserDetails) authentication.getPrincipal();
+        if (!(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
+            throw new AppException(
+                    HttpStatus.UNAUTHORIZED,
+                    "INVALID_AUTHENTICATION",
+                    "WebSocket authentication is invalid"
+            );
+        }
 
         Long userId = userDetails.getId();
 
-
-        if (req.getType() == null) {
-            throw new RuntimeException("Message type is null!");
+        if (req == null || req.getType() == null) {
+            throw new AppException(
+                    HttpStatus.BAD_REQUEST,
+                    "MESSAGE_TYPE_REQUIRED",
+                    "Message type is required"
+            );
         }
-
-        System.out.println(req.getType());
 
         switch (req.getType()) {
 
             case PRESENCE -> {
-                PresencePayload payload = objectMapper.convertValue(req.getPayload(), PresencePayload.class);
+                PresencePayload payload = convertPayload(req.getPayload(), PresencePayload.class);
 
                 messageService.processPresenceMessage(
                         diaryId,
@@ -78,44 +84,74 @@ public class MessageController {
 
             //CRDT update using y.js
             case YJSUPDATE->{
-                YjsPayload payload = objectMapper.convertValue(req.getPayload(), YjsPayload.class);
+                YjsPayload payload = convertPayload(req.getPayload(), YjsPayload.class);
                 messageService.processYjsUpdate(diaryId, payload.getDocumentId(), payload);
             }
 
             case CHAT -> {
-                ChatPayload payload = objectMapper.convertValue(req.getPayload(), ChatPayload.class);
+                ChatPayload payload = convertPayload(req.getPayload(), ChatPayload.class);
                 messageService.processChatMessage(diaryId, payload, userId);
             }
             case LEAVE -> messageService.processLeaveMessage(diaryId);
             case JOIN -> messageService.processJoinMessage(diaryId);
             case FILE -> messageService.processFileMessage(diaryId, req);
 
-            //handler if error here
-            default -> System.out.println("Invalid message type");
+            default -> throw new AppException(
+                    HttpStatus.BAD_REQUEST,
+                    "INVALID_MESSAGE_TYPE",
+                    "Unsupported message type"
+            );
         }
 
     }
 
-    private void requireBinding(Long diaryId, SimpMessageHeaderAccessor accessor) throws AccessDeniedException {
+    private void requireBinding(Long diaryId, SimpMessageHeaderAccessor accessor) {
         Map<String, Object> accessorAttributes = accessor.getSessionAttributes();
 
         if (accessorAttributes == null){
-            throw new AccessDeniedException("No websocket session");
+            throw new AppException(
+                    HttpStatus.UNAUTHORIZED,
+                    "WEBSOCKET_SESSION_NOT_FOUND",
+                    "WebSocket session attributes are missing"
+            );
         }
-        System.out.println("SESSION ATTRIBUTES = " + accessorAttributes);
 
         Long boundDiaryId = (Long) accessorAttributes.get("DIARY_ID");
 
         if (boundDiaryId == null) {
-            throw new AccessDeniedException("No diary bounded for session");
+            throw new AppException(
+                    HttpStatus.FORBIDDEN,
+                    "DIARY_SESSION_NOT_BOUND",
+                    "No diary is bound to this WebSocket session"
+            );
         }
-        System.out.println(
-                "BOUND DIARY = " +
-                        accessorAttributes.get("DIARY_ID")
-        );
 
         if(!boundDiaryId.equals(diaryId)){
-            throw new AccessDeniedException("Bounded diary dont matched");
+            throw new AppException(
+                    HttpStatus.FORBIDDEN,
+                    "DIARY_SESSION_MISMATCH",
+                    "This WebSocket session is not authorized for the requested diary"
+            );
+        }
+    }
+
+    private <T> T convertPayload(Object payload, Class<T> payloadType) {
+        if (payload == null) {
+            throw new AppException(
+                    HttpStatus.BAD_REQUEST,
+                    "MESSAGE_PAYLOAD_REQUIRED",
+                    "Message payload is required"
+            );
+        }
+
+        try {
+            return objectMapper.convertValue(payload, payloadType);
+        } catch (IllegalArgumentException ex) {
+            throw new AppException(
+                    HttpStatus.BAD_REQUEST,
+                    "INVALID_MESSAGE_PAYLOAD",
+                    "Message payload has an invalid format"
+            );
         }
     }
 

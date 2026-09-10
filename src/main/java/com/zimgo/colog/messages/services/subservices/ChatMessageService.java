@@ -4,10 +4,12 @@ import com.zimgo.colog.diary.Diary;
 import com.zimgo.colog.diary.DiaryService;
 import com.zimgo.colog.chat.ChatRepository;
 import com.zimgo.colog.chat.Chat;
+import com.zimgo.colog.exception.AppException;
 import com.zimgo.colog.messages.dto.MessageRespond;
 import com.zimgo.colog.messages.dto.payloads.ChatPayload;
 import com.zimgo.colog.user.User;
 import com.zimgo.colog.user.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -64,10 +66,18 @@ public class ChatMessageService {
         Diary diary = diaryService.getAccessibleDiary(diaryId, userId);
 
         if (diary == null){
-            throw new RuntimeException("Diary does not exist!");
+            throw new AppException(
+                    HttpStatus.NOT_FOUND,
+                    "DIARY_NOT_FOUND",
+                    "Diary not found"
+            );
         }
         if (sender == null){
-            throw new RuntimeException("User does not exist!");
+            throw new AppException(
+                    HttpStatus.NOT_FOUND,
+                    "USER_NOT_FOUND",
+                    "User not found"
+            );
         }
 
         String content = payload.getContent();
