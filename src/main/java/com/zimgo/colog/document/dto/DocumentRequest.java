@@ -1,5 +1,6 @@
 package com.zimgo.colog.document.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,5 +13,6 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 public class DocumentRequest {
+    @NotNull(message = "Document date is required")
     LocalDateTime date;
 }

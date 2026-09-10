@@ -3,6 +3,7 @@ package com.zimgo.colog.document;
 import com.zimgo.colog.document.dto.DocumentRequest;
 import com.zimgo.colog.revision.Revision;
 import com.zimgo.colog.revision.RevisionService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +30,7 @@ public class DocumentController {
     //CREATE a document
     @PostMapping("/{diaryId}/create")
     public ResponseEntity<?> createDocument(@PathVariable Long diaryId,
-                                            @RequestBody DocumentRequest req){
+                                            @Valid @RequestBody DocumentRequest req){
         return ResponseEntity.ok(documentService.createDocument(diaryId, requireBody(req)));
     }
 
@@ -52,7 +53,7 @@ public class DocumentController {
     @PatchMapping("/{diaryId}/{documentId}")
     public ResponseEntity<?> editDocument(@PathVariable Long diaryId,
                                           @PathVariable Long documentId,
-                                          @RequestBody DocumentRequest req) throws IOException {
+                                          @Valid @RequestBody DocumentRequest req) throws IOException {
         return ResponseEntity.ok(documentService.editDocument(diaryId,documentId, requireBody(req)));
     }
 
