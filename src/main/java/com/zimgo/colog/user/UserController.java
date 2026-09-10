@@ -2,6 +2,7 @@ package com.zimgo.colog.user;
 
 import com.zimgo.colog.user.dto.UserRequest;
 import jakarta.annotation.security.PermitAll;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,7 @@ public class UserController {
     }
 
     @PatchMapping("/edit/{id}")
-    public ResponseEntity<?> editUser(@RequestBody UserRequest req, @PathVariable Long id) {
+    public ResponseEntity<?> editUser(@Valid @RequestBody UserRequest req, @PathVariable Long id) {
         return ResponseEntity.ok(userService.editUser(requireBody(req), id));
     }
 
