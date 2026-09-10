@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
+import static com.zimgo.colog.exception.RequestValidator.requireBody;
+
 @RestController
 @RequestMapping("/document")
 public class DocumentController {
@@ -28,7 +30,7 @@ public class DocumentController {
     @PostMapping("/{diaryId}/create")
     public ResponseEntity<?> createDocument(@PathVariable Long diaryId,
                                             @RequestBody DocumentRequest req){
-        return ResponseEntity.ok(documentService.createDocument(diaryId,req));
+        return ResponseEntity.ok(documentService.createDocument(diaryId, requireBody(req)));
     }
 
     //GET all document in that diary
@@ -51,7 +53,7 @@ public class DocumentController {
     public ResponseEntity<?> editDocument(@PathVariable Long diaryId,
                                           @PathVariable Long documentId,
                                           @RequestBody DocumentRequest req) throws IOException {
-        return ResponseEntity.ok(documentService.editDocument(diaryId,documentId, req));
+        return ResponseEntity.ok(documentService.editDocument(diaryId,documentId, requireBody(req)));
     }
 
     //DELETE a document

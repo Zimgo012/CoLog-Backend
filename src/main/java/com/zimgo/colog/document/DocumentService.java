@@ -6,8 +6,10 @@ import com.zimgo.colog.diary.dto.DiaryResponse;
 import com.zimgo.colog.document.dto.DocumentListResponse;
 import com.zimgo.colog.document.dto.DocumentRequest;
 import com.zimgo.colog.document.dto.DocumentResponse;
+import com.zimgo.colog.exception.AppException;
 import com.zimgo.colog.revision.Revision;
 import com.zimgo.colog.revision.RevisionService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.print.Doc;
@@ -71,7 +73,7 @@ public class DocumentService {
 
         return documentRepository.findDocumentByDiaryIdAndDocumentId(diaryId, documentId)
                 .orElseThrow(
-                        () -> new RuntimeException("Document does not exist")
+                        () -> new AppException( HttpStatus.NOT_FOUND, "DOCUMENT_NOT_FOUND", "Document not found")
                 );
     }
 
@@ -79,7 +81,7 @@ public class DocumentService {
         diaryService.getAccessibleDiary(diaryId);
 
         Document document = documentRepository.findDocumentByDiaryIdAndDocumentId(diaryId, documentId)
-                .orElseThrow(() -> new RuntimeException("Document does not exist"));
+                .orElseThrow(() -> new AppException( HttpStatus.NOT_FOUND, "DOCUMENT_NOT_FOUND", "Document not found"));
         document.setDate(req.getDate());
 
         documentRepository.save(document);
@@ -93,7 +95,7 @@ public class DocumentService {
         diaryService.getAccessibleDiary(diaryId);
 
         Document document = documentRepository.findDocumentByDiaryIdAndDocumentId(diaryId,documentId)
-                .orElseThrow(() -> new RuntimeException("Document does not exist"));
+                .orElseThrow(() -> new AppException( HttpStatus.NOT_FOUND, "DOCUMENT_NOT_FOUND", "Document not found"));
 
         documentRepository.delete(document);
     }
@@ -103,7 +105,7 @@ public class DocumentService {
         diaryService.getAccessibleDiary(diaryId);
 
         Document document = documentRepository.findDocumentByDiaryIdAndDocumentId(diaryId,documentId)
-                .orElseThrow(() -> new RuntimeException("Document does not exist"));
+                .orElseThrow(() -> new AppException( HttpStatus.NOT_FOUND, "DOCUMENT_NOT_FOUND", "Document not found"));
 
         document.setYjsState(state);
 
@@ -115,12 +117,17 @@ public class DocumentService {
         diaryService.getAccessibleDiary(diaryId);
 
         Document document = documentRepository.findDocumentByDiaryIdAndDocumentId(diaryId,documentId)
-                .orElseThrow(() -> new RuntimeException("Document does not exist"));
+                .orElseThrow(() ->new AppException( HttpStatus.NOT_FOUND, "DOCUMENT_NOT_FOUND", "Document not found"));
 
         return document.getYjsState();
     }
     public void saveVersionSnapshot(Long documentId){
-              Document doc = documentRepository.findById(documentId).orElseThrow();
+        Document doc = documentRepository.findById(documentId)
+                .orElseThrow(() -> new AppException(
+                        HttpStatus.NOT_FOUND,
+                        "DOCUMENT_NOT_FOUND",
+                        "Document not found"
+                ));
 
               byte[] state = doc.getYjsState();
               revisionService.createRevision(documentId, state);
