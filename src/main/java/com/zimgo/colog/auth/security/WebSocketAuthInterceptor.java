@@ -21,7 +21,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
     private final JWTService jwtService;
     private final UserDetailsService userDetailsService;
-    private final DiaryService diaryService;
+//    private final DiaryService diaryService;
 
     /**
      * Constructs a {@code WebSocketAuthInterceptor} instance with the specified services.
@@ -32,13 +32,11 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
      *                            user information from JWT tokens.
      * @param userDetailsService  The {@code UserDetailsService} used for retrieving user
      *                            details based on authentication data.
-     * @param diaryService        The {@code DiaryService} responsible for managing diary
-     *                            operations and associating them with authenticated users.
+     *
      */
-    public WebSocketAuthInterceptor (JWTService jwtService, UserDetailsService userDetailsService,DiaryService diaryService){
+    public WebSocketAuthInterceptor (JWTService jwtService, UserDetailsService userDetailsService){
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
-        this.diaryService = diaryService;
     }
 
 
@@ -59,12 +57,17 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
         //}
 
         // 2. check if the command is 'CONNECT'
-        if(StompCommand.CONNECT.equals(accessor.getCommand())){
+        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
 
             Authentication authentication =
                     authenticate(accessor);
 
-            bindDiary(accessor,authentication);
+            String diaryIdHeader =
+                    accessor.getFirstNativeHeader("diaryId");
+
+            if (diaryIdHeader != null) {
+                bindDiary(accessor, authentication);
+            }
         }
 
         return message;
@@ -157,14 +160,6 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
         Long userId =
                 userDetails.getId();
-
-
-        // Database check only on connect
-        diaryService.getAccessibleDiary(
-                diaryId,
-                userId
-        );
-
 
 
         // Store authorization in session
