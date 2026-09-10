@@ -7,6 +7,7 @@ import com.zimgo.colog.messages.dto.payloads.ChatPayload;
 import com.zimgo.colog.messages.dto.payloads.PresencePayload;
 import com.zimgo.colog.messages.dto.payloads.YjsPayload;
 import com.zimgo.colog.messages.services.MessageService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -39,7 +40,7 @@ public class MessageController {
 
     @MessageMapping("/diary/session/{diaryId}")
     public void userMessage(@DestinationVariable Long diaryId,
-                            @Payload MessageRequest req,
+                            @Valid @Payload MessageRequest req,
                             SimpMessageHeaderAccessor accessor,
                             Principal principal) {
         requireBinding(diaryId, accessor);
