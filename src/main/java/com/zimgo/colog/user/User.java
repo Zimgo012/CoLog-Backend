@@ -50,13 +50,7 @@ public class User {
     private List<Diary> ownedDiary;
 
     @JsonIgnore
-    @Nullable
-    @ManyToMany
-    @JoinTable(
-            name = "collabotorsTable",
-            joinColumns = @JoinColumn(name = "collaborators"),
-            inverseJoinColumns = @JoinColumn(name = "collaboratedDiary")
-    )
+    @ManyToMany(mappedBy = "collaborators")
     private List<Diary> collaboratedDiary;
 
 }

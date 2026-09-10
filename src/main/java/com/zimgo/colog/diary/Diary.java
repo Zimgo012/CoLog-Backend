@@ -46,7 +46,12 @@ public class Diary {
     private User owner;
 
 
-    @ManyToMany(mappedBy = "collaboratedDiary")
+    @ManyToMany
+    @JoinTable(
+            name = "collabotorsTable",
+            joinColumns = @JoinColumn(name = "collaboratedDiary"),
+            inverseJoinColumns = @JoinColumn(name = "collaborators")
+    )
     @JsonIgnore
     private List<User> collaborators = new ArrayList<>();
 
