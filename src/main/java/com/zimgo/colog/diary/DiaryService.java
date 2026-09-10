@@ -2,6 +2,7 @@ package com.zimgo.colog.diary;
 
 import com.zimgo.colog.auth.security.CustomUserDetails;
 import com.zimgo.colog.diary.dto.*;
+import com.zimgo.colog.exception.AppException;
 import com.zimgo.colog.messages.dto.payloads.CollaboratorPayload;
 import com.zimgo.colog.messages.dto.payloads.enums.CollaboratorOperationType;
 import com.zimgo.colog.messages.services.MessageService;
@@ -9,6 +10,7 @@ import com.zimgo.colog.messages.services.subservices.NotificationMessageService;
 import com.zimgo.colog.user.User;
 import com.zimgo.colog.user.UserService;
 import org.aspectj.weaver.ast.Not;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -77,12 +79,12 @@ public class DiaryService {
 
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(() ->
-                        new RuntimeException("Diary does not exist")
+                        new AppException( HttpStatus.NOT_FOUND, "DIARY_NOT_FOUND", "DIARY not found")
                 );
 
 
         if(!canAccessDiary(diary,userId)){
-            throw new AccessDeniedException("User not authorized");
+            throw new AppException(HttpStatus.FORBIDDEN, "DIARY_ACCESS_DENIED", "You do not have permission to access this diary");
         }
 
         return diary;
@@ -104,25 +106,15 @@ public class DiaryService {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(() -> {
 
-                    return new RuntimeException(
-                            "Diary does not exist"
-                    );
+                    return new AppException( HttpStatus.NOT_FOUND, "DIARY_NOT_FOUND", "DIARY not found");
                 });
 
 
 
-        boolean access =
-                canAccessDiary(
-                        diary,
-                        userId
-                );
-
+        boolean access = canAccessDiary(diary, userId);
 
         if (!access) {
-
-            throw new AccessDeniedException(
-                    "User not authorized"
-            );
+            throw new AppException(HttpStatus.FORBIDDEN, "DIARY_ACCESS_DENIED", "You do not have permission to access this diary");
         }
 
         return diary;
@@ -411,13 +403,11 @@ public class DiaryService {
 
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(() ->
-                        new RuntimeException("Diary does not exist")
+                        new AppException( HttpStatus.NOT_FOUND, "DIARY_NOT_FOUND", "DIARY not found")
                 );
 
         if (!diary.getOwner().getUserId().equals(userId)) {
-            throw new AccessDeniedException(
-                    "Only the diary owner can perform this action"
-            );
+            throw new AppException(HttpStatus.FORBIDDEN, "DIARY_ACCESS_DENIED", "You do not have permission to access this diary");
         }
 
         return diary;

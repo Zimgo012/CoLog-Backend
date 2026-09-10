@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.zimgo.colog.exception.RequestValidator.requireBody;
+
 @RestController
 @RequestMapping("/diary")
 public class DiaryController {
@@ -54,7 +56,7 @@ public class DiaryController {
     public ResponseEntity<?> inviteUser(@PathVariable Long diaryId, @RequestBody DiaryCollaboratorRequest req){
 
 
-        DiaryCollaboratorResponse resp = diaryService.addCollaborator(diaryId,req);
+        DiaryCollaboratorResponse resp = diaryService.addCollaborator(diaryId, requireBody(req));
 
         CollaboratorPayload payload = new CollaboratorPayload(
                 resp.getDiaryId(),
@@ -74,7 +76,7 @@ public class DiaryController {
     @DeleteMapping("/{diaryId}/remove/collaborator")
     public ResponseEntity<?> removeUser(@PathVariable Long diaryId, @RequestBody DiaryCollaboratorRequest req){
 
-        DiaryCollaboratorResponse resp = diaryService.removeCollaborator(diaryId,req);
+        DiaryCollaboratorResponse resp = diaryService.removeCollaborator(diaryId, requireBody(req));
 
         CollaboratorPayload payload = new CollaboratorPayload(
                 resp.getDiaryId(),
@@ -92,7 +94,7 @@ public class DiaryController {
 
     @PostMapping("/create")
     public ResponseEntity<?> addDiary(@RequestBody DiaryRequest req) {
-        return ResponseEntity.ok(diaryService.addDiary(req));
+        return ResponseEntity.ok(diaryService.addDiary(requireBody(req)));
     }
 
     @DeleteMapping("/{id}")
@@ -103,7 +105,7 @@ public class DiaryController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<?> editDiary(@PathVariable Long id, @RequestBody DiaryEditRequest req){
-        return ResponseEntity.ok(diaryService.editDiary(id,req));
+        return ResponseEntity.ok(diaryService.editDiary(id, requireBody(req)));
     }
 
     @GetMapping("/my")
