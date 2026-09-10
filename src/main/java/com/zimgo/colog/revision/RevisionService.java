@@ -2,6 +2,8 @@ package com.zimgo.colog.revision;
 
 import com.zimgo.colog.document.Document;
 import com.zimgo.colog.document.DocumentRepository;
+import com.zimgo.colog.exception.AppException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +19,12 @@ public class RevisionService {
         this.documentRepository = documentRepository;
     }
     public void createRevision(Long documentId, byte[] state){
-        Document doc = documentRepository.findById(documentId).orElseThrow();
+        Document doc = documentRepository.findById(documentId)
+                .orElseThrow(() -> new AppException(
+                        HttpStatus.NOT_FOUND,
+                        "DOCUMENT_NOT_FOUND",
+                        "Document not found"
+                ));
 
         Revision revision = new Revision();
 
@@ -31,10 +38,16 @@ public class RevisionService {
     public Revision getRevision(Long documentId, Long revisionId) {
 
         Revision revision = revisionRepository.findById(revisionId)
-                .orElseThrow();
+                .orElseThrow(() -> new AppException(
+                        HttpStatus.NOT_FOUND,
+                        "REVISION_NOT_FOUND",
+                        "Revision not found"
+                ));
 
         if (!revision.getDocument().getDocumentId().equals(documentId)) {
-            throw new IllegalArgumentException(
+            throw new AppException(
+                    HttpStatus.BAD_REQUEST,
+                    "REVISION_DOCUMENT_MISMATCH",
                     "Revision does not belong to this document"
             );
         }
