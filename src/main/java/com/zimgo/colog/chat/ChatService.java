@@ -3,6 +3,8 @@ package com.zimgo.colog.chat;
 import com.zimgo.colog.chat.dto.ChatResponse;
 import com.zimgo.colog.diary.Diary;
 import com.zimgo.colog.diary.DiaryService;
+import com.zimgo.colog.exception.AppException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,7 +27,7 @@ public class ChatService {
         Diary diary = diaryService.getAccessibleDiary(diaryId);
 
         if (diary == null) {
-            throw new RuntimeException("Diary does not exist or is not accessible!");
+            throw new AppException(HttpStatus.FORBIDDEN, "DIARY_ACCESS_DENIED", "You do not have permission to access this diary");
         }
 
         List<Chat> messages =
