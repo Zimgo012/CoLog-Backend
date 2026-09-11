@@ -6,6 +6,7 @@ import com.zimgo.colog.messages.dto.payloads.CollaboratorPayload;
 import com.zimgo.colog.messages.dto.payloads.enums.CollaboratorOperationType;
 import com.zimgo.colog.messages.services.MessageService;
 import com.zimgo.colog.user.UserService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import static com.zimgo.colog.exception.RequestValidator.requireBody;
 
+@RateLimiter(name="api")
 @RestController
 @RequestMapping("/diary")
 public class DiaryController {

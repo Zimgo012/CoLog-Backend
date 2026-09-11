@@ -49,6 +49,10 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
         //                StompHeaderAccessor.wrap(message);
 
+        if (accessor == null) {
+            return message;
+        }
+
         // SAMPLE MESAGE: Command: CONNECT
         //Headers: {
         //    Authorization=[Bearer random123],
@@ -56,9 +60,35 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
         //    heart-beat=[10000,10000]
         //}
 
-        // 2. check if the command is 'CONNECT'
-        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+        StompCommand command = accessor.getCommand();
+        String destination = accessor.getDestination();
 
+        // 1. Public demo SEND
+        if (StompCommand.SEND.equals(command)
+                && "/app/demo".equals(destination)) {
+
+            return message;
+        }
+
+        // 2. Public demo SUBSCRIBE
+        if (StompCommand.SUBSCRIBE.equals(command)
+                && "/demo".equals(destination)) {
+
+            return message;
+        }
+
+        // 3. check if the command is 'CONNECT'
+        if (StompCommand.CONNECT.equals(command)) {
+
+            String authHeader =
+                    accessor.getFirstNativeHeader("Authorization");
+
+            // No JWT = anonymous/public connection
+            if (authHeader == null || authHeader.isBlank()) {
+                return message;
+            }
+
+            // JWT exists = authenticate user
             Authentication authentication =
                     authenticate(accessor);
 
@@ -68,7 +98,16 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
             if (diaryIdHeader != null) {
                 bindDiary(accessor, authentication);
             }
+
+            return message;
         }
+
+        // on disconnect
+        if (StompCommand.DISCONNECT.equals(command)) {
+            return message;
+        }
+
+        requireAuthentication(accessor);
 
         return message;
     }
@@ -210,5 +249,19 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 "INVALID_JWT",
                 "Invalid or expired JWT token"
         );
+    }
+
+    private void requireAuthentication(StompHeaderAccessor accessor) {
+
+        if (accessor.getUser() == null ||
+                !(accessor.getUser() instanceof Authentication authentication) ||
+                !authentication.isAuthenticated()) {
+
+            throw new AppException(
+                    HttpStatus.UNAUTHORIZED,
+                    "UNAUTHENTICATED_USER",
+                    "Authentication is required"
+            );
+        }
     }
 }

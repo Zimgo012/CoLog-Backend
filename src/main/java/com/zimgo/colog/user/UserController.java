@@ -1,6 +1,7 @@
 package com.zimgo.colog.user;
 
 import com.zimgo.colog.user.dto.UserRequest;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -9,9 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.zimgo.colog.exception.RequestValidator.requireBody;
 
-
 @RestController
 @RequestMapping("/user")
+@RateLimiter(name = "api")
 public class UserController {
 
     public UserService userService;

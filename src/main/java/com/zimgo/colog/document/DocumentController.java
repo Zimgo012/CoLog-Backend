@@ -3,6 +3,7 @@ package com.zimgo.colog.document;
 import com.zimgo.colog.document.dto.DocumentRequest;
 import com.zimgo.colog.revision.Revision;
 import com.zimgo.colog.revision.RevisionService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import static com.zimgo.colog.exception.RequestValidator.requireBody;
 
 @RestController
 @RequestMapping("/document")
+@RateLimiter(name="api")
 public class DocumentController {
 
     public DocumentService documentService;
