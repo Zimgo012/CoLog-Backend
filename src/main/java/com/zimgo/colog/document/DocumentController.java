@@ -92,25 +92,23 @@ public class DocumentController {
         return ResponseEntity.ok().build();
     }
 
-    //this would be an SSE on the future
     @GetMapping("/{documentId}/revisions")
     public ResponseEntity<List<Revision>>  getRevisions(
             @PathVariable Long documentId){
         return ResponseEntity.ok(revisionService.getDocumentRevisions(documentId));
     }
 
-    @PostMapping("/{documentId}/revision/save")
-    public ResponseEntity<?> saveStateSnapshot(@PathVariable Long documentId){
-
-        documentService.saveVersionSnapshot(documentId);
-        return ResponseEntity.ok().build();
+    @PostMapping(value = "/{documentId}/revision/save",
+            consumes = "application/octet-stream")
+    public ResponseEntity<?> saveStateSnapshot(@PathVariable Long documentId, @RequestBody byte[] update){
+        return ResponseEntity.ok(documentService.saveVersionSnapshot(documentId, update));
     }
 
-    @GetMapping("/{documentId}/revisions/{revisionId}")
-    public ResponseEntity<Revision> viewRevision(
-            @PathVariable Long documentId,
-            @PathVariable Long revisionId) {
+        @GetMapping("/{documentId}/revisions/{revisionId}")
+        public ResponseEntity<Revision> viewRevision(
+                @PathVariable Long documentId,
+                @PathVariable Long revisionId) {
 
-        return ResponseEntity.ok(revisionService.getRevision(documentId, revisionId));
-    }
+            return ResponseEntity.ok(revisionService.getRevision(documentId, revisionId));
+        }
 }

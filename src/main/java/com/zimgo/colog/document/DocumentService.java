@@ -9,6 +9,7 @@ import com.zimgo.colog.document.dto.DocumentResponse;
 import com.zimgo.colog.exception.AppException;
 import com.zimgo.colog.revision.Revision;
 import com.zimgo.colog.revision.RevisionService;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,7 @@ public class DocumentService {
     public Document createDocument(Document document) throws IOException {
         Document savedDoc = documentRepository.save(document);
         byte[] state = new byte[]{1,3,4,5,6};
-        revisionService.createRevision(savedDoc.getDocumentId(), state);
+        revisionService.createRevision(savedDoc, state);
 
 
         return savedDoc;
@@ -121,16 +122,28 @@ public class DocumentService {
 
         return document.getYjsState();
     }
-    public void saveVersionSnapshot(Long documentId){
-        Document doc = documentRepository.findById(documentId)
+
+    @Transactional
+    public Revision saveVersionSnapshot(Long documentId, byte[] update) {
+        if (update == null || update.length == 0) {
+            throw new AppException(
+                    HttpStatus.BAD_REQUEST,
+                    "EMPTY_YJS_UPDATE",
+                    "Snapshot update is empty"
+            );
+        }
+
+        Document document = documentRepository.findById(documentId)
                 .orElseThrow(() -> new AppException(
                         HttpStatus.NOT_FOUND,
                         "DOCUMENT_NOT_FOUND",
                         "Document not found"
                 ));
 
-              byte[] state = doc.getYjsState();
-              revisionService.createRevision(documentId, state);
+        // Use your actual diary-ID getter name here.
+        diaryService.getAccessibleDiary(document.getDiary().getDiaryId());
+
+        return revisionService.createRevision(document, update);
     }
 
 }

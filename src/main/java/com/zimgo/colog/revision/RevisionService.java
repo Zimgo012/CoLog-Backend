@@ -6,6 +6,8 @@ import com.zimgo.colog.exception.AppException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -18,21 +20,16 @@ public class RevisionService {
         this.revisionRepository = revisionRepository;
         this.documentRepository = documentRepository;
     }
-    public void createRevision(Long documentId, byte[] state){
-        Document doc = documentRepository.findById(documentId)
-                .orElseThrow(() -> new AppException(
-                        HttpStatus.NOT_FOUND,
-                        "DOCUMENT_NOT_FOUND",
-                        "Document not found"
-                ));
-
+    public Revision createRevision(Document document, byte[] update) {
         Revision revision = new Revision();
 
-        revision.setDocument(doc);
-        revision.setYjsUpdate(state);
+        revision.setDocument(document);
+        revision.setSaveDate(LocalDateTime.now());
 
-        revisionRepository.save(revision);
+        // Important: persist a snapshot copy, not the mutable request array.
+        revision.setYjsUpdate(Arrays.copyOf(update, update.length));
 
+        return revisionRepository.save(revision);
     }
 
     public Revision getRevision(Long documentId, Long revisionId) {
