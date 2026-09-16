@@ -42,7 +42,11 @@ public class Document {
     )
     private byte[] yjsState;
 
-    @OneToMany
+    @OneToMany(
+            mappedBy = "document",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     public List<Revision> revisions = new ArrayList<>();
 
 }
