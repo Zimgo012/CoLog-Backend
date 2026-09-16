@@ -50,12 +50,12 @@ class DocumentServiceRevisionTest {
                 .thenReturn(Optional.of(document));
 
         // Act
-        documentService.saveVersionSnapshot(documentId);
+        documentService.saveVersionSnapshot(documentId, state);
 
         // Assert
         verify(documentRepository).findById(documentId);
 
         verify(revisionService)
-                .createRevision(documentId, state);
+                .createRevision(document, state);
     }
 }

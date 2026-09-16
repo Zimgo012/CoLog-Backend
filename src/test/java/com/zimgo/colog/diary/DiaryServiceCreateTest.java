@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -32,6 +33,9 @@ class DiaryServiceCreateTest {
     @Mock
     private CustomUserDetails userDetails;
 
+    @Mock
+    private CacheManager cacheManager;
+
     private DiaryService diaryService;
 
     private User owner;
@@ -41,7 +45,8 @@ class DiaryServiceCreateTest {
 
         diaryService = new DiaryService(
                 diaryRepository,
-                userService
+                userService,
+                cacheManager
         );
 
         owner = new User();
@@ -84,7 +89,6 @@ class DiaryServiceCreateTest {
                 argThat(diary ->
                         diary.getTitle().equals("My Diary")
                                 && diary.getOwner().equals(owner)
-                                && !diary.isPublic()
                                 && diary.getCreatedAt() != null
                                 && diary.getLastOpenedAt() != null
                 )

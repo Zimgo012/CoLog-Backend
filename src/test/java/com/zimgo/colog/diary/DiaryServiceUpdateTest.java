@@ -1,6 +1,7 @@
 package com.zimgo.colog.diary;
 
 import com.zimgo.colog.auth.security.CustomUserDetails;
+import com.zimgo.colog.diary.dto.DiaryCollaboratorRequest;
 import com.zimgo.colog.user.User;
 import com.zimgo.colog.user.UserService;
 import org.junit.jupiter.api.AfterEach;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +35,9 @@ class DiaryServiceUpdateTest {
     @Mock
     private CustomUserDetails userDetails;
 
+    @Mock
+    private CacheManager cacheManager;
+
     private DiaryService diaryService;
 
     private User owner;
@@ -44,7 +49,8 @@ class DiaryServiceUpdateTest {
 
         diaryService = new DiaryService(
                 diaryRepository,
-                userService
+                userService,
+                cacheManager
         );
 
         owner = new User();
@@ -76,7 +82,7 @@ class DiaryServiceUpdateTest {
         when(userService.getUserById(2L))
                 .thenReturn(collaborator);
 
-        diaryService.addCollaborator(100L, 2L);
+        diaryService.addCollaborator(100L, new DiaryCollaboratorRequest("mail@sample.com"));
 
         assertTrue(
                 diary.getCollaborators()
@@ -98,7 +104,7 @@ class DiaryServiceUpdateTest {
         when(userService.getUserById(2L))
                 .thenReturn(collaborator);
 
-        diaryService.addCollaborator(100L, 2L);
+        diaryService.addCollaborator(100L, new DiaryCollaboratorRequest("mail@sample.com"));
 
         assertEquals(
                 1,
@@ -119,7 +125,7 @@ class DiaryServiceUpdateTest {
 
         assertThrows(
                 AccessDeniedException.class,
-                () -> diaryService.addCollaborator(100L, 3L)
+                () -> diaryService.addCollaborator(100L, new DiaryCollaboratorRequest("mail@sample.com"))
         );
 
         verify(diaryRepository, never())
@@ -137,7 +143,7 @@ class DiaryServiceUpdateTest {
         when(userService.getUserById(2L))
                 .thenReturn(collaborator);
 
-        diaryService.removeCollaborator(100L, 2L);
+        diaryService.removeCollaborator(100L, new DiaryCollaboratorRequest());
 
         assertFalse(
                 diary.getCollaborators()
@@ -160,7 +166,7 @@ class DiaryServiceUpdateTest {
 
         assertThrows(
                 AccessDeniedException.class,
-                () -> diaryService.removeCollaborator(100L, 1L)
+                () -> diaryService.removeCollaborator(100L, new DiaryCollaboratorRequest("mail@sample.com"))
         );
 
         verify(diaryRepository, never())

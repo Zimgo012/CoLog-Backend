@@ -1,0 +1,10 @@
+target/
+.git/
+.github/
+.idea/
+.vscode/
+*.iml
+.DS_Store
+.env
+/src/main/resources/application-dev.yml
+/src/main/resources/application-dev2.yml

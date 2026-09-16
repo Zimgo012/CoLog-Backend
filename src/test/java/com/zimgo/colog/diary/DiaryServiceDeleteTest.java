@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +35,9 @@ class DiaryServiceDeleteTest {
     @Mock
     private CustomUserDetails userDetails;
 
+    @Mock
+    private CacheManager cacheManager;
+
     private DiaryService diaryService;
 
     private User owner;
@@ -45,7 +49,8 @@ class DiaryServiceDeleteTest {
 
         diaryService = new DiaryService(
                 diaryRepository,
-                userService
+                userService,
+                cacheManager
         );
 
         owner = new User();
