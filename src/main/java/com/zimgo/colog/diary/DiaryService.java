@@ -10,6 +10,8 @@ import com.zimgo.colog.messages.services.subservices.NotificationMessageService;
 import com.zimgo.colog.user.User;
 import com.zimgo.colog.user.UserService;
 import org.aspectj.weaver.ast.Not;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
@@ -30,15 +32,16 @@ import java.util.List;
 @Service
 public class DiaryService {
     private final UserService userService;
-    private final SimpMessagingTemplate simpMessagingTemplate;
     public DiaryRepository diaryRepository;
+
+    private final CacheManager cacheManager;
 
     public DiaryService(DiaryRepository diaryRepository,
                         UserService userService,
-                        SimpMessagingTemplate simpMessagingTemplate) {
+                        CacheManager cacheManager) {
         this.diaryRepository = diaryRepository;
         this.userService = userService;
-        this.simpMessagingTemplate = simpMessagingTemplate;
+        this.cacheManager = cacheManager;
     }
 
     /**
@@ -131,7 +134,19 @@ public class DiaryService {
     public  List<DiaryResponse> getMyDiaries(){
 
        Long userId = getIdFromJwt();
-       return diaryRepository.findAllByOwnerUserId(userId)
+       Cache cache = cacheManager.getCache("myDiaries");
+       String cacheKey = "user:" + userId;
+
+        if (cache != null) {
+
+            Cache.ValueWrapper cached = cache.get(cacheKey);
+
+            if (cached != null) {
+                return (List<DiaryResponse>) cached.get();
+            }
+        }
+
+       List<DiaryResponse> diaries= diaryRepository.findAllByOwnerUserId(userId)
                 .stream()
                 .map(diary -> new DiaryResponse(
                         diary.getDiaryId(),
@@ -142,6 +157,12 @@ public class DiaryService {
                         diary.getColor()
                 ))
                 .toList();
+
+        if (cache != null) {
+            cache.put(cacheKey, diaries);
+        }
+
+        return diaries;
     }
 
     /**
@@ -212,6 +233,9 @@ public class DiaryService {
         diary.setOwner(user);
 
         diaryRepository.save(diary);
+
+        // Invalidate cached diary list
+        evictMyDiariesCache(id);
 
         DiaryResponse response = new DiaryResponse();
         response.setId(diary.getDiaryId());
@@ -303,8 +327,10 @@ public class DiaryService {
         Diary diary = getOwnedDiary(diaryId);
         Long id = diary.getDiaryId();
         String title  = diary.getTitle();
+        Long ownerId = diary.getOwner().getUserId();
 
         diaryRepository.delete(diary);
+        evictMyDiariesCache(ownerId);
 
         return new DiaryDeleteResponse(id, title);
     }
@@ -324,6 +350,10 @@ public class DiaryService {
         diaryFromDB.setTitle((req.getTitle() != null) ? req.getTitle() : diaryFromDB.getTitle());
         diaryFromDB.setEmoji((req.getEmoji() != null) ? req.getEmoji() : diaryFromDB.getEmoji());
         diaryFromDB.setColor((req.getColor() != null) ? req.getColor() : diaryFromDB.getColor());
+
+        evictMyDiariesCache(
+                diaryFromDB.getOwner().getUserId()
+        );
 
         diaryRepository.save(diaryFromDB);
         DiaryResponse resp = new DiaryResponse();
@@ -413,6 +443,17 @@ public class DiaryService {
         return diary;
     }
 
+
+    private void evictMyDiariesCache(Long userId) {
+
+        Cache cache = cacheManager.getCache("myDiaries");
+
+        if (cache != null) {
+            cache.evict("user:" + userId);
+        }
+    }
+
+    
 
 
 }

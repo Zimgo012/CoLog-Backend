@@ -4,6 +4,7 @@ import com.zimgo.colog.auth.security.CustomUserDetails;
 import com.zimgo.colog.exception.AppException;
 import com.zimgo.colog.user.dto.UserRequest;
 import com.zimgo.colog.user.dto.UserResponse;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -75,9 +76,8 @@ public class UserService {
      */
     public User getUserByEmail(String email){
 
-
         boolean userExist = userRepository.existsByEmail(email);
-        if (!userExist){
+        if (!   userExist){
             throw new AppException(
                     HttpStatus.NOT_FOUND,
                     "USER_NOT_FOUND",
