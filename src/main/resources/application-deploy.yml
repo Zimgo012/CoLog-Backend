@@ -58,3 +58,9 @@ resilience4j:
         limit-for-period: 30
         limit-refresh-period: 10s
         timeout-duration: 0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

@@ -66,6 +66,8 @@ public class SecurityConfig {
                             .permitAll()
                         .requestMatchers("/user/check/**")
                             .permitAll()
+                        .requestMatchers("/actuator/health")
+                            .permitAll()
                         .anyRequest()
                             .authenticated()
                 );
