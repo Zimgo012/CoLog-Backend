@@ -72,12 +72,6 @@
             <version>2.4.0</version>
         </dependency>
 
-        <!-- Spring boot mail      -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-mail</artifactId>
-            </dependency>
-
         <!--JWT-->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
